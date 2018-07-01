@@ -1,0 +1,81 @@
+{{ define "title" }}Tailon{{ end }}
+{{ define "description" }}File Viewer{{ end }}
+
+{{ define "body" }}
+
+<script>
+ var allowedCommandNames = {{.AllowedCommandNames}};
+ var commandScripts = {{.CommandScripts}};
+</script>
+
+<div id="app">
+    <transition name="fade">
+        <div v-if="!hideToolbar" id="toolbar">
+            <div class="tailon-dark toolbar-item" id="file-select">
+                <multiselect v-model="file" :options="fileList"
+                             :group-select="true"
+                             :allow-empty="false"
+                             group-values="files"
+                             group-label="group"
+                             track-by="alias"
+                             label="alias"
+                             @open="refreshFiles"
+                             :searchable="true" :show-labels="false" placeholder="File"></multiselect>
+                <!-- <select v-model="file" tabindex="1"></select> -->
+            </div>
+
+            <div class="tailon-dark toolbar-item" id="command-select">
+                <multiselect v-model="command" :options="allowedCommandNames" :searchable="true" :show-labels="false" placeholder="Command"></multiselect>
+            </div>
+
+            <div class="toolbar-item toolbar-item-fill">
+                <div id="script-input" tabindex="3">
+                    <input v-model="script" type="text" name="script" placeholder="" :disabled="!scriptInputEnabled" spellcheck="false">
+                    <div><i class="icon-bookmark"></i></div>
+                    <div><i class="icon-code"></i></div>
+                </div>
+            </div>
+
+            <div class="toolbar-item" tabindex="4">
+                <div class="button-group" id="action-bar">
+                    <a :href="downloadLink" title="Download File"><i class="fas fa-download"></i></a>
+                    <a @click="showConfig = !showConfig" title="Configure"><i class="fas fa-wrench"></i></a>
+                    <a @click="clearLogview" title="Clear Logview"><i class="fas fa-eraser"></i></a>
+                    <a @click="hideToolbar = true" title="Hide Toolbar"><i class="fas fa-chevron-circle-up"></i></a>
+                </div>
+            </div>
+        </div>
+    </transition>
+
+    <div v-if="hideToolbar" class="button-group">
+        <a @click="hideToolbar = false" title="Show Toolbar"><i class="fas fa-chevron-circle-down"></i></a>
+    </div>
+
+    <transition name="fade">
+    <div v-if="showConfig" id="configuration">
+        <form>
+            <p>
+                <label for="history-lines">Lines of history:</label>
+                <input v-model="linesOfHistory" type="number" name="history-lines" min="0">
+            </p>
+            <p>
+                <label for="tail-lines">Initial lines to tail:</label>
+                <input v-model="linesToTail" type="number" name="tail-lines" min="1">
+            </p>
+            <p>
+                <label for="wrap-lines">Toggle line wrapping:</label>
+                <input v-model="wrapLines" type="checkbox" name="wrap-lines" id="wrap-lines">
+            </p>
+        </form>
+    </div>
+    </transition>
+
+    <vue-loading :active.sync="showLoadingOverlay" :can-cancel="false"></vue-loading>
+
+    <div class="scrollable">
+        <logview ref="logview" v-bind:lines-of-history="linesOfHistory"></logview>
+    </div>
+
+</div>
+
+{{ end }}
