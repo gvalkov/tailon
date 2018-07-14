@@ -206,6 +206,7 @@ var app = new Vue({
                 nlines: this.linesToTail
             };
             console.log("sending msg: ", msg);
+            this.clearLogview();
             this.socket.send(JSON.stringify(msg));
         }
     },
