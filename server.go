@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 	"github.com/gvalkov/tailon/cmd"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"html/template"
@@ -15,18 +14,16 @@ import (
 	"time"
 )
 
-func SetupRoutes(relativeroot string) *mux.Router {
-	router := mux.NewRouter()
-	prefix := router.PathPrefix(relativeroot).Subrouter()
+func SetupRoutes(relativeroot string) *http.ServeMux {
+	router := http.NewServeMux()
 
-	sockjsHandler := sockjs.NewHandler("/ws", sockjs.DefaultOptions, wsHandler)
+	sockjsHandler := sockjs.NewHandler("ws", sockjs.DefaultOptions, wsHandler)
 	staticHandler := noCacheControl(http.FileServer(http.Dir("frontend/dist/")))
-	staticHandler = http.StripPrefix(config.RelativeRoot+"static/", staticHandler)
+	staticHandler = http.StripPrefix(relativeroot+"static/", staticHandler)
 
-	prefix.HandleFunc("/", indexHandler)
-	prefix.PathPrefix("/static/").Handler(staticHandler)
-	prefix.Handle("/ws/", sockjsHandler)
-	prefix.Path("/ws/{any:.*}").Handler(sockjsHandler)
+	router.HandleFunc(relativeroot+"", indexHandler)
+	router.Handle(relativeroot+"static/", staticHandler)
+	router.Handle(relativeroot+"ws/", sockjsHandler)
 
 	return router
 }
