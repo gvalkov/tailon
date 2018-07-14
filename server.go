@@ -17,7 +17,7 @@ import (
 func SetupRoutes(relativeroot string) *http.ServeMux {
 	router := http.NewServeMux()
 
-	sockjsHandler := sockjs.NewHandler("ws", sockjs.DefaultOptions, wsHandler)
+	sockjsHandler := sockjs.NewHandler(relativeroot+"ws", sockjs.DefaultOptions, wsHandler)
 	staticHandler := noCacheControl(http.FileServer(http.Dir("frontend/dist/")))
 	staticHandler = http.StripPrefix(relativeroot+"static/", staticHandler)
 
