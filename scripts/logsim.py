@@ -84,7 +84,8 @@ async def logwriter(args):
     coros = []
     for fn in args.files:
         w = writer(fn, gen, lock=lock, rate=args.rate, update_msec=args.update_msec)
-        t = truncater(fn, lock=lock, truncate_msec=args.truncate_msec)
+        if not args.no_truncate:
+            t = truncater(fn, lock=lock, truncate_msec=args.truncate_msec)
         coros.append(w)
         coros.append(t)
 
@@ -102,6 +103,7 @@ def main():
     arg = parser.add_argument
     arg('--update-msec',   default=1000,  metavar='msec', type=tuple_or_int)
     arg('--truncate-msec', default=10000, metavar='msec', type=tuple_or_int)
+    arg('--no-truncate', action='store_false')
     arg('--rate', default=1, metavar='msec', type=tuple_or_int)
     arg('--seed', default=str(time.time()))
     arg('files', nargs=argparse.REMAINDER)
