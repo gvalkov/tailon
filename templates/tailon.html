@@ -30,7 +30,7 @@
 
             <div class="toolbar-item toolbar-item-fill">
                 <div id="script-input" tabindex="3">
-                    <input v-model="script" type="text" name="script" placeholder="" :disabled="!scriptInputEnabled" spellcheck="false">
+                    <input v-model="script" @keyup.enter="notifyBackend" type="text" name="script" placeholder="" :disabled="!scriptInputEnabled" spellcheck="false">
                     <div><i class="icon-bookmark"></i></div>
                     <div><i class="icon-code"></i></div>
                 </div>

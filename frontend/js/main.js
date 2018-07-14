@@ -148,7 +148,7 @@ var app = new Vue({
             this.$refs.logview.clearLines();
         },
         backendConnect: function ( ){
-            console.log('connecting to ' + apiURL)
+            console.log('connecting to ' + apiURL);
             this.showLoadingOverlay = true;
             this.socket = new SockJS(apiURL);
             this.socket.onopen = this.onBackendOpen;
@@ -197,6 +197,16 @@ var app = new Vue({
         refreshFiles: function () {
             console.log("updating file list");
             this.socket.send("list");
+        },
+        notifyBackend: function () {
+            var msg = {
+                command: this.command,
+                script: this.script,
+                entry: this.file,
+                nlines: this.linesToTail
+            };
+            console.log("sending msg: ", msg);
+            this.socket.send(JSON.stringify(msg));
         }
     },
     watch: {
@@ -204,20 +214,15 @@ var app = new Vue({
             this.showLoadingOverlay = !val;
         },
         command: function(val) {
-            this.script = this.commandScripts[val];
+            if (val && this.isConnected) {
+                this.script = this.commandScripts[val];
+                this.notifyBackend();
+            }
         },
         file: function(val) {
-            if (!val) {
-                return;
+            if (val && this.isConnected) {
+                this.notifyBackend();
             }
-            var msg = {
-                command: this.command,
-                script: this.script,
-                entry: val,
-                nlines: this.linesToTail
-            };
-            console.log("sending msg: ", msg);
-            this.socket.send(JSON.stringify(msg));
         }
     }
 });
