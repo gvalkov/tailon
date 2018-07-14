@@ -1,3 +1,4 @@
+// A webapp for looking at and searching through files.
 package main
 
 import (
@@ -10,6 +11,42 @@ import (
 	"log"
 	"strings"
 )
+
+const scriptDescription = `
+Usage: tailon [options] -c <config file>
+Usage: tailon [options] <filespec> [<filespec> ...]
+
+Tailon is a webapp for looking at and searching through files and streams.
+`
+
+const scriptEpilog = `
+Tailon can be configured through a config file or with command-line flags.
+
+The command-line interface expects one or more filespec arguments, which
+specify the files or directories to be served. The expected format is:
+
+  [[glob|dir|file],alias=name,group=name,]<path>
+
+The default filespec is 'file' and points to a single, possibly non-existent
+file. The file name in the UI can be overwritten with the 'alias=' specifier.
+
+The 'glob' filespec evaluates to the list of files that match a shell file
+name pattern. The pattern is evaluated each time the file list is refreshed.
+The 'alias=' specifier overwrites the parent directory of each matched file.
+
+The 'dir' specifier evaluates to all files in a directory.
+
+The "group=" specifier sets the group in which files appear in the file
+dropdown of the toolbar.
+
+Example usage:
+  tailon alias=messages,/var/log/messages "glob:/var/log/*.log"
+  tailon -b localhost:8080 -c config.toml
+`
+
+const configFileHelp = `
+<todo>
+`
 
 const defaultTomlConfig = `
 title = "Tailon file viewer"
@@ -36,26 +73,7 @@ allowed-commands = ["tail", "grep", "sed", "awk"]
   stdin = "tail"
   action = ["awk", "--sandbox", "$script"]
   default = "{print $0; fflush()}"
-`
 
-const scriptDescription = `
-Usage: tailon [options] -c <config file>
-Usage: tailon [options] <filespec> [<filespec> ...]
-
-Tailon is a webapp for looking at and searching through log files.
-`
-
-const scriptEpilog = `
-The format of the one or more positional 'filespec' arguments is:
-  [[glob|dir|file],alias=name,group=name,]<path>
-
-Example usage:
-  tailon /var/log/messages /var/log/debug /var/log/*.log
-  tailon -b localhost:8080 -c config.ini
-`
-
-const configFileHelp = `
-<todo>
 `
 
 type CommandSpec struct {
@@ -64,8 +82,11 @@ type CommandSpec struct {
 	Default string
 }
 
-func parseTomlConfig(config string) (*toml.Tree, map[string]CommandSpec, error) {
+func parseTomlConfig(config string) (*toml.Tree, map[string]CommandSpec) {
 	cfg, err := toml.Load(config)
+	if err != nil {
+		log.Fatal("Error parsing config: ", err)
+	}
 
 	commands := make(map[string]CommandSpec)
 
@@ -79,9 +100,11 @@ func parseTomlConfig(config string) (*toml.Tree, map[string]CommandSpec, error) 
 		commands[key] = command
 	}
 
-	return cfg, commands, err
+	return cfg, commands
 }
 
+// FileSpec is an instance of a file to be monitored. These are mapped to
+// os.Args or the [files] elements in the config file.
 type FileSpec struct {
 	Path  string
 	Type  string
@@ -89,14 +112,21 @@ type FileSpec struct {
 	Group string
 }
 
+// Parse a string into a filespec. Example inputs are:
+//   file,alias=1,group=2,/var/log/messages
+//   /var/log/messages
+//   glob,/var/log/*
 func parseFileSpec(spec string) (FileSpec, error) {
 	var filespec FileSpec
 	parts := strings.Split(spec, ",")
 
+	// If no specifiers are given, default is file.
 	if length := len(parts); length == 1 {
 		return FileSpec{spec, "file", "", ""}, nil
 	}
 
+	// The last part is the path. We'll probably need a more robust
+	// solution in the future.
 	path, parts := parts[len(parts)-1], parts[:len(parts)-1]
 
 	for _, part := range parts {
@@ -139,7 +169,7 @@ type Config struct {
 var config = Config{}
 
 func main() {
-	defaultConfig, commandSpecs, _ := parseTomlConfig(defaultTomlConfig)
+	defaultConfig, commandSpecs := parseTomlConfig(defaultTomlConfig)
 
 	printHelp := flag.BoolP("help", "h", false, "Show this help message and exit")
 	printConfigHelp := flag.BoolP("help-config", "e", false, "Show config file help and exit")
