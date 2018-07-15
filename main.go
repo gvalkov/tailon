@@ -3,12 +3,11 @@ package main
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/mitchellh/mapstructure"
 	"github.com/pelletier/go-toml"
 	flag "github.com/spf13/pflag"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -40,40 +39,67 @@ The "group=" specifier sets the group in which files appear in the file
 dropdown of the toolbar.
 
 Example usage:
+  tailon file1.txt file2.txt file3.txt
   tailon alias=messages,/var/log/messages "glob:/var/log/*.log"
   tailon -b localhost:8080 -c config.toml
+
+For information on usage through the configuration file, please refer to the
+'--help-config' option.
 `
 
 const configFileHelp = `
-<todo>
+Tailon can be configured through a TOML config file. The config file allows
+more configurability than the command-line interface.
+
+  # The <title> of the index page.
+  title = "Tailon file viewer"
+
+  # The root of the web application.
+  relative-root = "/"
+
+  # The address to listen on.
+  listen-addr = ":8080"
+
+  # Allow download of know files (only those matched by a filespec).
+  allow-download = true
+
+  # Commands that will appear in the UI.
+  allow-commands = ["tail", "grep", "sed", "awk"]
+
+  # File, glob and dir filespecs are similar in principle to their
+  # command-line counterparts.
+
+  # TODO
+
+At startup, tailon loads a default config file. The contents of that file are:
 `
 
 const defaultTomlConfig = `
-title = "Tailon file viewer"
-relative-root = "/"
-listen-addr = ":8080"
-allow-download = true
-allow-commands = ["tail", "grep", "sed", "awk"]
+  title = "Tailon file viewer"
+  relative-root = "/"
+  listen-addr = ":8080"
+  allow-download = true
+  allow-commands = ["tail", "grep", "sed", "awk"]
 
-[commands]
+  [commands]
 
-  [commands.tail]
-  action = ["tail", "-n", "$lines", "-F", "$path"]
+    [commands.tail]
+    action = ["tail", "-n", "$lines", "-F", "$path"]
 
-  [commands.grep]
-  stdin = "tail"
-  action = ["grep", "--text", "--line-buffered", "--color=never", "-e", "$script"]
-  default = ".*"
+    [commands.grep]
+    stdin = "tail"
+    action = ["grep", "--text", "--line-buffered", "--color=never", "-e", "$script"]
+    default = ".*"
 
-  [commands.sed]
-  stdin = "tail"
-  action = ["sed", "-u", "-e", "$script"]
-  default = "s/.*/&/"
+    [commands.sed]
+    stdin = "tail"
+    action = ["sed", "-u", "-e", "$script"]
+    default = "s/.*/&/"
 
-  [commands.awk]
-  stdin = "tail"
-  action = ["awk", "--sandbox", "$script"]
-  default = "{print $0; fflush()}"
+    [commands.awk]
+    stdin = "tail"
+    action = ["awk", "--sandbox", "$script"]
+    default = "{print $0; fflush()}"
 `
 
 type CommandSpec struct {
@@ -187,7 +213,7 @@ func main() {
 	config = makeConfig()
 
 	printHelp := flag.BoolP("help", "h", false, "Show this help message and exit")
-	printConfigHelp := flag.BoolP("help-config", "e", false, "Show config file help and exit")
+	printConfigHelp := flag.BoolP("help-config", "e", false, "Show configuration file help and exit")
 
 	flag.StringVarP(&config.BindAddr, "bind", "b", config.BindAddr, "Listen on the specified address and port")
 	flag.StringVarP(&config.ConfigPath, "config", "c", "", "")
@@ -208,7 +234,7 @@ func main() {
 	}
 
 	if *printConfigHelp {
-		fmt.Fprintln(os.Stderr, strings.Trim(configFileHelp, "\n"))
+		fmt.Fprintf(os.Stderr, "%s\n\n%s\n", strings.Trim(configFileHelp, "\n"), strings.Trim(defaultTomlConfig, "\n"))
 		os.Exit(0)
 	}
 
