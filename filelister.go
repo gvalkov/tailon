@@ -29,7 +29,10 @@ func fileInfo(path string) *ListEntry {
 	return &entry
 }
 
+var AllFiles map[string]bool
+
 func createListing(filespecs []FileSpec) map[string][]*ListEntry {
+	AllFiles = make(map[string]bool)
 	res := make(map[string][]*ListEntry)
 
 	for _, spec := range filespecs {
@@ -47,6 +50,7 @@ func createListing(filespecs []FileSpec) map[string][]*ListEntry {
 				entry.Alias = entry.Path
 			}
 			res[group] = append(res[group], entry)
+			AllFiles[entry.Path] = true
 		case "glob":
 			matches, _ := filepath.Glob(spec.Path)
 			for _, match := range matches {
@@ -59,9 +63,15 @@ func createListing(filespecs []FileSpec) map[string][]*ListEntry {
 					entry.Alias = rel
 				}
 				res[group] = append(res[group], entry)
+				AllFiles[entry.Path] = true
 			}
 		}
 	}
 
 	return res
+}
+
+func fileAllowed(path string) bool {
+	_, ok := AllFiles[path]
+	return ok
 }

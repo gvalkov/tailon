@@ -26,6 +26,7 @@ func SetupRoutes(relativeroot string) *http.ServeMux {
 	staticHandler = http.StripPrefix(relativeroot+"static/", staticHandler)
 
 	router.HandleFunc(relativeroot+"", indexHandler)
+	router.HandleFunc(relativeroot+"files/", downloadHandler)
 	router.Handle(relativeroot+"static/", staticHandler)
 	router.Handle(relativeroot+"ws/", sockjsHandler)
 
@@ -51,6 +52,15 @@ func SetupServer(config *Config, logger *log.Logger) *http.Server {
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	t := template.Must(template.ParseFiles("templates/base.html", "templates/tailon.html"))
 	t.Execute(w, config)
+}
+
+func downloadHandler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Query()["path"][0]
+	if !fileAllowed(path) {
+		log.Printf("warn: attempt to access unknown file: %s", path)
+		http.Error(w, "unknown file", http.StatusNotFound)
+	}
+	http.ServeFile(w, r, path)
 }
 
 func noCacheControl(h http.Handler) http.Handler {

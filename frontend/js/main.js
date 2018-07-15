@@ -138,7 +138,7 @@ var app = new Vue({
         },
         downloadLink: function () {
             if (this.file) {
-                return relativeRoot + 'files/' + this.file;
+                return relativeRoot + 'files/?path=' + this.file.path;
             }
             return '#';
         }
