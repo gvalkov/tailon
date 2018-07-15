@@ -181,12 +181,10 @@ func makeConfig() *Config {
 	return &config
 }
 
-var logger *log.Logger
 var config = &Config{}
 
 func main() {
 	config = makeConfig()
-	logger = log.New(os.Stderr, "main: ", log.LstdFlags)
 
 	printHelp := flag.BoolP("help", "h", false, "Show this help message and exit")
 	printConfigHelp := flag.BoolP("help-config", "e", false, "Show config file help and exit")
@@ -240,10 +238,10 @@ func main() {
 		config.CommandScripts[cmd] = values.Default
 	}
 
-	logger.Print("Generate initial file listing")
+	log.Print("Generate initial file listing")
 	createListing(config.FileSpecs)
 
-	loggerHtml := log.New(os.Stdout, "http: ", log.LstdFlags)
+	loggerHtml := log.New(os.Stdout, "", log.LstdFlags)
 	loggerHtml.Printf("Server start, relative-root: %s, bind-addr: %s\n", config.RelativeRoot, config.BindAddr)
 
 	server := SetupServer(config, loggerHtml)
