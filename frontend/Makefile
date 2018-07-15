@@ -19,6 +19,7 @@ EXTERNAL_CSS := \
 
 INTERNAL_JS := \
 	js/util.js \
+	js/logview.js \
 	js/main.js
 
 INTERNAL_CSS := \
