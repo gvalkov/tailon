@@ -112,6 +112,7 @@ var app = new Vue({
 
         'fileList': [],
         'allowCommandNames': allowCommandNames,
+        'allowDownload': allowDownload,
 
         'file': null,
         'command': null,
