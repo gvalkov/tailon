@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-func SetupRoutes(relativeroot string) *http.ServeMux {
+func setupRoutes(relativeroot string) *http.ServeMux {
 	router := http.NewServeMux()
 
 	// This is either "frontend/frontend.go" or "frontend/assets_vfsdata.go", depending
@@ -34,8 +34,8 @@ func SetupRoutes(relativeroot string) *http.ServeMux {
 	return router
 }
 
-func SetupServer(config *Config, logger *log.Logger) *http.Server {
-	router := SetupRoutes(config.RelativeRoot)
+func setupServer(config *Config, logger *log.Logger) *http.Server {
+	router := setupRoutes(config.RelativeRoot)
 	loggingRouter := handlers.LoggingHandler(os.Stderr, router)
 
 	server := http.Server{
@@ -79,7 +79,7 @@ func noCacheControl(h http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-// The messages that the client sends to the server.
+// FrontendCommand instances are the messages that the client sends to the server when the file, tool or script change.
 type FrontendCommand struct {
 	Command string
 	Script  string
@@ -125,27 +125,27 @@ func wsWriter(session sockjs.Session, messages chan string, done <-chan struct{}
 				}
 				session.Send(string(b))
 			} else if msg[0] == '{' {
-				msg_json := FrontendCommand{}
-				json.Unmarshal([]byte(msg), &msg_json)
+				msgJSON := FrontendCommand{}
+				json.Unmarshal([]byte(msg), &msgJSON)
 
-				if !fileAllowed(msg_json.Entry.Path) {
-					log.Print("Unknown file: ", msg_json.Entry.Path)
+				if !fileAllowed(msgJSON.Entry.Path) {
+					log.Print("Unknown file: ", msgJSON.Entry.Path)
 					continue
 				}
 
 				killProcs(procA, procB)
 
 				// Check if the command is using another command for stdin.
-				stdinSource := config.CommandSpecs[msg_json.Command].Stdin
+				stdinSource := config.CommandSpecs[msgJSON.Command].Stdin
 				if stdinSource != "" {
 					actionA := config.CommandSpecs[stdinSource].Action
-					actionA = expandCommandArgs(actionA, msg_json)
+					actionA = expandCommandArgs(actionA, msgJSON)
 					procA = exec.Command(actionA[0], actionA[1:]...)
 					log.Print("Running command: ", actionA)
 				}
 
-				actionB := config.CommandSpecs[msg_json.Command].Action
-				actionB = expandCommandArgs(actionB, msg_json)
+				actionB := config.CommandSpecs[msgJSON.Command].Action
+				actionB = expandCommandArgs(actionB, msgJSON)
 				procB = cmd.NewCmdOptions(cmdOptions, actionB[0], actionB[1:]...)
 				log.Print("Running command: ", actionB)
 

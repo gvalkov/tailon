@@ -13,20 +13,20 @@ import (
 )
 
 func TestRelativeRoot(t *testing.T) {
-	r1 := SetupRoutes("/tailon/")
-	assertHttpCode(t, r1, "/tailon/", 200)
-	assertHttpCode(t, r1, "/tailon/ws/", 200)
-	assertHttpCode(t, r1, "/tailon/static/favicon.ico", 200)
+	r1 := setupRoutes("/tailon/")
+	assetHTTPCode(t, r1, "/tailon/", 200)
+	assetHTTPCode(t, r1, "/tailon/ws/", 200)
+	assetHTTPCode(t, r1, "/tailon/static/favicon.ico", 200)
 
-	r2 := SetupRoutes("/")
-	assertHttpCode(t, r2, "/", 200)
-	assertHttpCode(t, r2, "/ws/", 200)
-	assertHttpCode(t, r2, "/static/favicon.ico", 200)
+	r2 := setupRoutes("/")
+	assetHTTPCode(t, r2, "/", 200)
+	assetHTTPCode(t, r2, "/ws/", 200)
+	assetHTTPCode(t, r2, "/static/favicon.ico", 200)
 }
 
 func TestSockjsList(t *testing.T) {
 	setupConfig()
-	ts := httptest.NewServer(SetupRoutes("/tailon/"))
+	ts := httptest.NewServer(setupRoutes("/tailon/"))
 	conn := sockjsConnect(t, ts)
 	defer ts.Close()
 
@@ -44,16 +44,16 @@ func TestSockjsList(t *testing.T) {
 
 func TestFrontendMessage(t *testing.T) {
 	setupConfig()
-	ts := httptest.NewServer(SetupRoutes("/tailon/"))
+	ts := httptest.NewServer(setupRoutes("/tailon/"))
 	conn := sockjsConnect(t, ts)
 	defer ts.Close()
 
-	msg_tail := `{"command":"tail","script":null,"entry":{"path":"testdata/ex1/var/log/1.log","alias":"/tmp/t1","size":14342,"mtime":"2018-07-14T15:07:33.524768369+02:00","exists":true},"nlines":10}`
+	msgTail := `{"command":"tail","script":null,"entry":{"path":"testdata/ex1/var/log/1.log","alias":"/tmp/t1","size":14342,"mtime":"2018-07-14T15:07:33.524768369+02:00","exists":true},"nlines":10}`
 
-	msg_grep := `{"command":"grep","script":".*","entry":{"path":"testdata/ex1/var/log/1.log","alias":"/tmp/t1","size":14342,"mtime":"2018-07-14T15:07:33.524768369+02:00","exists":true},"nlines":10}`
+	msgGrep := `{"command":"grep","script":".*","entry":{"path":"testdata/ex1/var/log/1.log","alias":"/tmp/t1","size":14342,"mtime":"2018-07-14T15:07:33.524768369+02:00","exists":true},"nlines":10}`
 
 	// Run tail on file - there should be only 1 tail proc.
-	if err := conn.WriteJSON([]string{msg_tail}); err != nil {
+	if err := conn.WriteJSON([]string{msgTail}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -63,7 +63,7 @@ func TestFrontendMessage(t *testing.T) {
 	}
 
 	// Run grep on file - there should be 1 tail and 1 grep procs.
-	if err := conn.WriteJSON([]string{msg_grep}); err != nil {
+	if err := conn.WriteJSON([]string{msgGrep}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -73,7 +73,7 @@ func TestFrontendMessage(t *testing.T) {
 	}
 
 	// Run tail again - the grep proc should have been killed and there should be 1 tail proc.
-	if err := conn.WriteJSON([]string{msg_tail}); err != nil {
+	if err := conn.WriteJSON([]string{msgTail}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -90,7 +90,7 @@ func sockjsReadJSON(t *testing.T, conn *websocket.Conn, v interface{}) {
 	}
 
 	a := []string{}
-	msg = msg[1:len(msg)]
+	msg = msg[1:]
 	if err := json.Unmarshal(msg, &a); err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func sockjsReadJSON(t *testing.T, conn *websocket.Conn, v interface{}) {
 
 func sockjsConnect(t *testing.T, ts *httptest.Server) *websocket.Conn {
 	url := "ws" + ts.URL[4:] + "/tailon/ws/0/0/websocket"
-	conn, _, err := websocket.DefaultDialer.Dial(url, map[string][]string{"Origin": []string{ts.URL}})
+	conn, _, err := websocket.DefaultDialer.Dial(url, map[string][]string{"Origin": {ts.URL}})
 
 	if err != nil {
 		t.Fatal(err)
@@ -111,7 +111,7 @@ func sockjsConnect(t *testing.T, ts *httptest.Server) *websocket.Conn {
 	return conn
 }
 
-func assertHttpCode(t *testing.T, routes *http.ServeMux, path string, code int) {
+func assetHTTPCode(t *testing.T, routes *http.ServeMux, path string, code int) {
 	ts := httptest.NewServer(routes)
 	defer ts.Close()
 
@@ -129,9 +129,9 @@ func assertHttpCode(t *testing.T, routes *http.ServeMux, path string, code int) 
 func setupConfig() {
 	config = makeConfig()
 	config.FileSpecs = []FileSpec{
-		FileSpec{"testdata/ex1/var/log/1.log", "file", "", ""},
-		FileSpec{"testdata/ex1/var/log/2.log", "file", "", ""},
-		FileSpec{"testdata/ex1/var/log/na.log", "file", "", ""},
+		{"testdata/ex1/var/log/1.log", "file", "", ""},
+		{"testdata/ex1/var/log/2.log", "file", "", ""},
+		{"testdata/ex1/var/log/na.log", "file", "", ""},
 	}
 }
 

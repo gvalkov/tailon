@@ -102,6 +102,7 @@ const defaultTomlConfig = `
     default = "{print $0; fflush()}"
 `
 
+// CommandSpec defines a command that the server can execute.
 type CommandSpec struct {
 	Stdin   string
 	Action  []string
@@ -116,8 +117,8 @@ func parseTomlConfig(config string) (*toml.Tree, map[string]CommandSpec) {
 
 	commands := make(map[string]CommandSpec)
 
-	cfg_commands := cfg.Get("commands").(*toml.Tree).ToMap()
-	for key, value := range cfg_commands {
+	cfgCommands := cfg.Get("commands").(*toml.Tree).ToMap()
+	for key, value := range cfgCommands {
 		command := CommandSpec{}
 		err := mapstructure.Decode(value, &command)
 		if err != nil {
@@ -179,6 +180,7 @@ func parseFileSpec(spec string) (FileSpec, error) {
 
 }
 
+// Config contains all backend and frontend configuration options and relevant state.
 type Config struct {
 	RelativeRoot      string
 	BindAddr          string
@@ -267,9 +269,9 @@ func main() {
 	log.Print("Generate initial file listing")
 	createListing(config.FileSpecs)
 
-	loggerHtml := log.New(os.Stdout, "", log.LstdFlags)
-	loggerHtml.Printf("Server start, relative-root: %s, bind-addr: %s\n", config.RelativeRoot, config.BindAddr)
+	loggerHTML := log.New(os.Stdout, "", log.LstdFlags)
+	loggerHTML.Printf("Server start, relative-root: %s, bind-addr: %s\n", config.RelativeRoot, config.BindAddr)
 
-	server := SetupServer(config, loggerHtml)
+	server := setupServer(config, loggerHTML)
 	server.ListenAndServe()
 }

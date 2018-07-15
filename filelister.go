@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// ListEntry is an entry that appears in the UI file input. All FileSpecs ultimately  result in  one or more ListEntry instances, which  the server ships off to the client.
 type ListEntry struct {
 	Path    string    `json:"path"`
 	Alias   string    `json:"alias"`
@@ -29,10 +30,10 @@ func fileInfo(path string) *ListEntry {
 	return &entry
 }
 
-var AllFiles map[string]bool
+var allFiles map[string]bool
 
 func createListing(filespecs []FileSpec) map[string][]*ListEntry {
-	AllFiles = make(map[string]bool)
+	allFiles = make(map[string]bool)
 	res := make(map[string][]*ListEntry)
 
 	for _, spec := range filespecs {
@@ -50,7 +51,7 @@ func createListing(filespecs []FileSpec) map[string][]*ListEntry {
 				entry.Alias = entry.Path
 			}
 			res[group] = append(res[group], entry)
-			AllFiles[entry.Path] = true
+			allFiles[entry.Path] = true
 		case "glob":
 			matches, _ := filepath.Glob(spec.Path)
 			for _, match := range matches {
@@ -63,7 +64,7 @@ func createListing(filespecs []FileSpec) map[string][]*ListEntry {
 					entry.Alias = rel
 				}
 				res[group] = append(res[group], entry)
-				AllFiles[entry.Path] = true
+				allFiles[entry.Path] = true
 			}
 		}
 	}
@@ -72,6 +73,6 @@ func createListing(filespecs []FileSpec) map[string][]*ListEntry {
 }
 
 func fileAllowed(path string) bool {
-	_, ok := AllFiles[path]
+	_, ok := allFiles[path]
 	return ok
 }
