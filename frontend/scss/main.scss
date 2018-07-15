@@ -150,6 +150,12 @@ div #command-select {
   }
 }
 
+.toolbar-hidden {
+  position: absolute;
+  right: 0px;
+  top: 5px;
+}
+
 #configuration {
   position: absolute;
   top: 5px;
