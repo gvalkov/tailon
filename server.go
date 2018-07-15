@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gvalkov/tailon/cmd"
 	"github.com/gvalkov/tailon/frontend"
+	"github.com/shurcooL/httpfs/html/vfstemplate"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"html/template"
 	"log"
@@ -23,12 +24,12 @@ func SetupRoutes(relativeroot string) *http.ServeMux {
 	staticHandler := noCacheControl(http.FileServer(frontend.Assets))
 
 	sockjsHandler := sockjs.NewHandler(relativeroot+"ws", sockjs.DefaultOptions, wsHandler)
-	staticHandler = http.StripPrefix(relativeroot+"static/", staticHandler)
+	staticHandler = http.StripPrefix(relativeroot+"vfs/", staticHandler)
 
-	router.HandleFunc(relativeroot+"", indexHandler)
-	router.HandleFunc(relativeroot+"files/", downloadHandler)
-	router.Handle(relativeroot+"static/", staticHandler)
+	router.Handle(relativeroot+"vfs/", staticHandler)
 	router.Handle(relativeroot+"ws/", sockjsHandler)
+	router.HandleFunc(relativeroot+"files/", downloadHandler)
+	router.HandleFunc(relativeroot+"", indexHandler)
 
 	return router
 }
@@ -50,7 +51,7 @@ func SetupServer(config *Config, logger *log.Logger) *http.Server {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	t := template.Must(template.ParseFiles("templates/base.html", "templates/tailon.html"))
+	t := template.Must(vfstemplate.ParseFiles(frontend.Assets, nil, "/templates/base.html", "/templates/tailon.html"))
 	t.Execute(w, config)
 }
 
