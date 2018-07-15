@@ -73,7 +73,6 @@ allowed-commands = ["tail", "grep", "sed", "awk"]
   stdin = "tail"
   action = ["awk", "--sandbox", "$script"]
   default = "{print $0; fflush()}"
-
 `
 
 type CommandSpec struct {
@@ -166,18 +165,30 @@ type Config struct {
 	FileSpecs      []FileSpec
 }
 
-var config = Config{}
+func makeConfig() *Config {
+	defaults, commandSpecs := parseTomlConfig(defaultTomlConfig)
+
+	config := Config{
+		BindAddr:     defaults.Get("listen-addr").(string),
+		RelativeRoot: defaults.Get("relative-root").(string),
+		CommandSpecs: commandSpecs,
+	}
+
+	mapstructure.Decode(defaults.Get("allowed-commands"), &config.AllowedCommandNames)
+	return &config
+}
+
+var config = &Config{}
 
 func main() {
-	defaultConfig, commandSpecs := parseTomlConfig(defaultTomlConfig)
+	config = makeConfig()
 
 	printHelp := flag.BoolP("help", "h", false, "Show this help message and exit")
 	printConfigHelp := flag.BoolP("help-config", "e", false, "Show config file help and exit")
 
-	flag.StringVarP(&config.BindAddr, "bind", "b", defaultConfig.Get("listen-addr").(string), "Listen on the specified address and port")
+	flag.StringVarP(&config.BindAddr, "bind", "b", config.BindAddr, "Listen on the specified address and port")
 	flag.StringVarP(&config.ConfigPath, "config", "c", "", "")
-	flag.StringVarP(&config.RelativeRoot, "relative-root", "r", defaultConfig.Get("relative-root").(string), "webapp relative root")
-
+	flag.StringVarP(&config.RelativeRoot, "relative-root", "r", config.RelativeRoot, "webapp relative root")
 	flag.Parse()
 
 	flag.Usage = func() {
@@ -197,6 +208,11 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Ensure that relative root is always '/' or '/$arg/'.
+	config.RelativeRoot = "/" + strings.TrimLeft(config.RelativeRoot, "/")
+	config.RelativeRoot = strings.TrimRight(config.RelativeRoot, "/") + "/"
+
+	// Handle command-line file specs
 	filespecs := make([]FileSpec, len(flag.Args()))
 	for _, spec := range flag.Args() {
 		if filespec, err := parseFileSpec(spec); err != nil {
@@ -213,18 +229,13 @@ func main() {
 		os.Exit(2)
 	}
 
-	config.RelativeRoot = "/" + strings.TrimLeft(config.RelativeRoot, "/")
-	config.RelativeRoot = strings.TrimRight(config.RelativeRoot, "/") + "/"
-	mapstructure.Decode(defaultConfig.Get("allowed-commands"), &config.AllowedCommandNames)
-	config.CommandSpecs = commandSpecs
-
 	config.CommandScripts = make(map[string]string)
 	for cmd, values := range config.CommandSpecs {
 		config.CommandScripts[cmd] = values.Default
 	}
 
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
-	logger.Println("Server is starting", config.RelativeRoot)
+	logger.Printf("Server is starting, relative-root: %s, bind-addr: %s\n", config.RelativeRoot, config.BindAddr)
 
 	server := SetupServer(config, logger)
 	server.ListenAndServe()
