@@ -6,7 +6,11 @@ body {
   overflow: hidden;
   height: 100vh;
   background-color: $tailon-logview-background-color;
-  width:100%;
+  width: 100%;
+}
+
+#app {
+  height: 100%;
 }
 
 //----------------------------------------------------------------------------
