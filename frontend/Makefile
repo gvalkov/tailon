@@ -9,7 +9,6 @@ EXTERNAL_JS := \
 	node_modules/vue-multiselect/dist/vue-multiselect.min.js \
 	node_modules/sockjs-client/dist/sockjs.js \
 	node_modules/html5shiv/dist/html5shiv.js \
-	node_modules/@fortawesome/fontawesome-free/js/all.js \
 	node_modules/vue-loading-overlay/dist/vue-loading.min.js
 
 EXTERNAL_CSS := \

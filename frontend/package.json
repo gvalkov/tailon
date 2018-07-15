@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "devDependencies": {
-    "@fortawesome/fontawesome-free": "^5.1.0-4",
     "autoprefixer": "^8.6.1",
     "debounce": "^1.1.0",
     "html5shiv": "^3.7.3",
