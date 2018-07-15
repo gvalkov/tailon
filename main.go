@@ -52,7 +52,7 @@ const defaultTomlConfig = `
 title = "Tailon file viewer"
 relative-root = "/"
 listen-addr = ":8080"
-allowed-commands = ["tail", "grep", "sed", "awk"]
+allow-commands = ["tail", "grep", "sed", "awk"]
 
 [commands]
 
@@ -159,6 +159,7 @@ type Config struct {
 	WrapLinesInitial    bool
 	TailLinesInitial    int
 	AllowedCommandNames []string
+	AllowCommandNames []string
 
 	CommandSpecs   map[string]CommandSpec
 	CommandScripts map[string]string
@@ -174,7 +175,7 @@ func makeConfig() *Config {
 		CommandSpecs: commandSpecs,
 	}
 
-	mapstructure.Decode(defaults.Get("allowed-commands"), &config.AllowedCommandNames)
+	mapstructure.Decode(defaults.Get("allow-commands"), &config.AllowCommandNames)
 	return &config
 }
 

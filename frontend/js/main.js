@@ -111,7 +111,7 @@ var app = new Vue({
         'commandScripts': commandScripts,
 
         'fileList': [],
-        'allowedCommandNames': allowedCommandNames,
+        'allowCommandNames': allowCommandNames,
 
         'file': null,
         'command': null,
@@ -130,7 +130,7 @@ var app = new Vue({
     },
     created: function () {
         this.backendConnect();
-        this.command = this.allowedCommandNames[0];
+        this.command = this.allowCommandNames[0];
     },
     computed: {
         scriptInputEnabled: function () {
