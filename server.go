@@ -153,6 +153,12 @@ func wsWriter(session sockjs.Session, c chan string, done <-chan struct{}) {
 }
 
 func killProcs(procA *exec.Cmd, procB *cmd.Cmd) {
+	if procA != nil {
+		log.Printf("Stopping pid %d", procA.Process.Pid)
+		procA.Process.Kill()
+		procA.Wait()
+	}
+
 	if procB != nil {
 		log.Printf("Stopping pid %d", procB.Status().PID)
 		if procB.Stdin != nil {
@@ -160,12 +166,6 @@ func killProcs(procA *exec.Cmd, procB *cmd.Cmd) {
 		}
 		procB.Stop()
 	}
-
-	if procA != nil {
-		log.Printf("Stopping pid %d", procA.Process.Pid)
-		procA.Process.Kill()
-	}
-
 }
 
 func wsHandler(session sockjs.Session) {

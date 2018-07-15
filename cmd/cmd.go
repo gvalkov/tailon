@@ -61,7 +61,7 @@ type Cmd struct {
 	Name   string
 	Args   []string
 	Env    []string
-	Stdin  io.Reader
+	Stdin  io.ReadCloser
 	Stdout chan string // streaming STDOUT if enabled, else nil (see Options)
 	Stderr chan string // streaming STDERR if enabled, else nil (see Options)
 	*sync.Mutex
