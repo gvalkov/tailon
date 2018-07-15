@@ -127,6 +127,11 @@ func wsWriter(session sockjs.Session, messages chan string, done <-chan struct{}
 				msg_json := FrontendCommand{}
 				json.Unmarshal([]byte(msg), &msg_json)
 
+				if !fileAllowed(msg_json.Entry.Path) {
+					log.Print("Unknown file: ", msg_json.Entry.Path)
+					continue
+				}
+
 				killProcs(procA, procB)
 
 				// Check if the command is using another command for stdin.
