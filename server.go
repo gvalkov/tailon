@@ -28,7 +28,7 @@ func SetupRoutes(relativeroot string) *http.ServeMux {
 	return router
 }
 
-func SetupServer(config Config, logger *log.Logger) *http.Server {
+func SetupServer(config *Config, logger *log.Logger) *http.Server {
 	router := SetupRoutes(config.RelativeRoot)
 	loggingRouter := handlers.LoggingHandler(os.Stderr, router)
 
@@ -127,10 +127,7 @@ func wsWriter(session sockjs.Session, c chan string, done <-chan struct{}) {
 				msg_json := FrontendCommand{}
 				json.Unmarshal([]byte(msg), &msg_json)
 
-				if procB != nil {
-					log.Printf("Stopping pid %d", procB.Status().PID)
-					procB.Stop()
-				}
+				killProcs(procA, procB)
 
 				// Check if the command is using another command for stdin.
 				stdinSource := config.CommandSpecs[msg_json.Command].Stdin
@@ -149,13 +146,26 @@ func wsWriter(session sockjs.Session, c chan string, done <-chan struct{}) {
 				go runCommand(procA, procB, session)
 			}
 		case <-done:
-			if procB != nil {
-				log.Printf("Stopping pid %d", procB.Status().PID)
-				procB.Stop()
-			}
+			killProcs(procA, procB)
 			return
 		}
 	}
+}
+
+func killProcs(procA *exec.Cmd, procB *cmd.Cmd) {
+	if procB != nil {
+		log.Printf("Stopping pid %d", procB.Status().PID)
+		if procB.Stdin != nil {
+			procB.Stdin.Close()
+		}
+		procB.Stop()
+	}
+
+	if procA != nil {
+		log.Printf("Stopping pid %d", procA.Process.Pid)
+		procA.Process.Kill()
+	}
+
 }
 
 func wsHandler(session sockjs.Session) {
@@ -169,6 +179,8 @@ func wsHandler(session sockjs.Session) {
 		if msg, err := session.Recv(); err == nil {
 			c <- msg
 			continue
+		} else {
+			log.Print(err)
 		}
 		break
 	}

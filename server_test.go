@@ -2,9 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"os/exec"
+	"strings"
 	"testing"
 )
 
@@ -21,14 +25,10 @@ func TestRelativeRoot(t *testing.T) {
 }
 
 func TestSockjsList(t *testing.T) {
+	setupConfig()
 	ts := httptest.NewServer(SetupRoutes("/tailon/"))
 	conn := sockjsConnect(t, ts)
-
-	config.FileSpecs = []FileSpec{
-		FileSpec{"testdata/ex1/var/log/1.log", "file", "", ""},
-		FileSpec{"testdata/ex1/var/log/2.log", "file", "", ""},
-		FileSpec{"testdata/ex1/var/log/na.log", "file", "", ""},
-	}
+	defer ts.Close()
 
 	if err := conn.WriteJSON([]string{"list"}); err != nil {
 		t.Fatal(err)
@@ -39,6 +39,47 @@ func TestSockjsList(t *testing.T) {
 	sockjsReadJSON(t, conn, &v)
 	if len(v["__default__"]) != 3 {
 		t.Fatal("len() != 3")
+	}
+}
+
+func TestFrontendMessage(t *testing.T) {
+	setupConfig()
+	ts := httptest.NewServer(SetupRoutes("/tailon/"))
+	conn := sockjsConnect(t, ts)
+	defer ts.Close()
+
+	msg_tail := `{"command":"tail","script":null,"entry":{"path":"testdata/ex1/var/log/1.log","alias":"/tmp/t1","size":14342,"mtime":"2018-07-14T15:07:33.524768369+02:00","exists":true},"nlines":10}`
+
+	msg_grep := `{"command":"grep","script":".*","entry":{"path":"testdata/ex1/var/log/1.log","alias":"/tmp/t1","size":14342,"mtime":"2018-07-14T15:07:33.524768369+02:00","exists":true},"nlines":10}`
+
+	// Run tail on file - there should be only 1 tail proc.
+	if err := conn.WriteJSON([]string{msg_tail}); err != nil {
+		t.Fatal(err)
+	}
+
+	procs := getChildProcs()
+	if len(procs) != 1 {
+		t.Fatal(procs)
+	}
+
+	// Run grep on file - there should be 1 tail and 1 grep procs.
+	if err := conn.WriteJSON([]string{msg_grep}); err != nil {
+		t.Fatal(err)
+	}
+
+	procs = getChildProcs()
+	if len(procs) != 2 {
+		t.Fatal(procs)
+	}
+
+	// Run tail again - the grep proc should have been killed and there should be 1 tail proc.
+	if err := conn.WriteJSON([]string{msg_tail}); err != nil {
+		t.Fatal(err)
+	}
+
+	procs = getChildProcs()
+	if len(procs) != 1 {
+		t.Fatal(procs)
 	}
 }
 
@@ -83,4 +124,25 @@ func assertHttpCode(t *testing.T, routes *http.ServeMux, path string, code int) 
 	if res.StatusCode != code {
 		t.Fatalf("GET %s: %d != %d", path, res.StatusCode, code)
 	}
+}
+
+func setupConfig() {
+	config = makeConfig()
+	config.FileSpecs = []FileSpec{
+		FileSpec{"testdata/ex1/var/log/1.log", "file", "", ""},
+		FileSpec{"testdata/ex1/var/log/2.log", "file", "", ""},
+		FileSpec{"testdata/ex1/var/log/na.log", "file", "", ""},
+	}
+}
+
+func getChildProcs() map[string]string {
+	procs := make(map[string]string)
+	out, _ := exec.Command("sh", "-c", fmt.Sprintf("pgrep -l -P %d", os.Getpid())).Output()
+
+	for _, line := range strings.Split(strings.Trim(string(out), "\n"), "\n") {
+		parts := strings.Split(line, " ")
+		procs[parts[1]] = parts[0]
+	}
+
+	return procs
 }
