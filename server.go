@@ -62,7 +62,7 @@ func downloadHandler(w http.ResponseWriter, r *http.Request) {
 
 	path := r.URL.Query()["path"][0]
 	if !fileAllowed(path) {
-		log.Printf("warn: attempt to access unknown file: %s", path)
+		logger.Printf("warn: attempt to access unknown file: %s", path)
 		http.Error(w, "unknown file", http.StatusNotFound)
 		return
 	}
@@ -99,7 +99,7 @@ func wsHandler(session sockjs.Session) {
 			messages <- msg
 			continue
 		} else {
-			log.Print(err)
+			logger.Print(err)
 		}
 		break
 	}
@@ -120,7 +120,7 @@ func wsWriter(session sockjs.Session, messages chan string, done <-chan struct{}
 				lst := createListing(config.FileSpecs)
 				b, err := json.Marshal(lst)
 				if err != nil {
-					log.Println("error: ", err)
+					logger.Println("error: ", err)
 				}
 				session.Send(string(b))
 			} else if msg[0] == '{' {
@@ -128,7 +128,7 @@ func wsWriter(session sockjs.Session, messages chan string, done <-chan struct{}
 				json.Unmarshal([]byte(msg), &msg_json)
 
 				if !fileAllowed(msg_json.Entry.Path) {
-					log.Print("Unknown file: ", msg_json.Entry.Path)
+					logger.Print("Unknown file: ", msg_json.Entry.Path)
 					continue
 				}
 
@@ -140,13 +140,13 @@ func wsWriter(session sockjs.Session, messages chan string, done <-chan struct{}
 					actionA := config.CommandSpecs[stdinSource].Action
 					actionA = expandCommandArgs(actionA, msg_json)
 					procA = exec.Command(actionA[0], actionA[1:]...)
-					log.Print("Running command: ", actionA)
+					logger.Print("Running command: ", actionA)
 				}
 
 				actionB := config.CommandSpecs[msg_json.Command].Action
 				actionB = expandCommandArgs(actionB, msg_json)
 				procB = cmd.NewCmdOptions(cmdOptions, actionB[0], actionB[1:]...)
-				log.Print("Running command: ", actionB)
+				logger.Print("Running command: ", actionB)
 
 				// Start streaming procB's stdout and stderr to the client.
 				go streamOutput(procA, procB, session)
@@ -206,13 +206,13 @@ func streamOutput(procA *exec.Cmd, procB *cmd.Cmd, session sockjs.Session) {
 
 func killProcs(procA *exec.Cmd, procB *cmd.Cmd) {
 	if procA != nil {
-		log.Printf("Stopping pid %d", procA.Process.Pid)
+		logger.Printf("Stopping pid %d", procA.Process.Pid)
 		procA.Process.Kill()
 		procA.Wait()
 	}
 
 	if procB != nil {
-		log.Printf("Stopping pid %d", procB.Status().PID)
+		logger.Printf("Stopping pid %d", procB.Status().PID)
 		if procB.Stdin != nil {
 			procB.Stdin.Close()
 		}
