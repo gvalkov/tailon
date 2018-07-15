@@ -23,6 +23,9 @@ Vue.component('logview', {
             this.history = [],
             this.lastSpan = null;
         },
+        toggleWrapLines: function(val) {
+            this.$el.classList.toggle('log-view-wrapped', val);
+        },
         createSpan: function (innerHtml, classNames) {
             var span = document.createElement('span');
             span.innerHTML = innerHtml;
@@ -214,6 +217,9 @@ var app = new Vue({
     watch: {
         isConnected: function(val) {
             this.showLoadingOverlay = !val;
+        },
+        wrapLines: function(val) {
+            this.$refs.logview.toggleWrapLines(val);
         },
         command: function(val) {
             if (val && this.isConnected) {
