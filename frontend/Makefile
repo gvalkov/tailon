@@ -2,6 +2,7 @@ CMD_CLEANCSS   := node_modules/clean-css-cli/bin/cleancss
 CMD_NODESASS   := node_modules/node-sass/bin/node-sass
 CMD_UGLIFY	   := node_modules/uglify-js/bin/uglifyjs
 
+BUILD ?= prod
 DISTDIR ?= dist
 
 EXTERNAL_JS := \
@@ -26,41 +27,52 @@ INTERNAL_CSS := \
 
 ALL_TARGETS := \
 	$(DISTDIR)/3rdparty.js \
-	$(DISTDIR)/3rdparty.min.js \
 	$(DISTDIR)/3rdparty.css \
-	$(DISTDIR)/3rdparty.min.css \
 	$(DISTDIR)/main.css \
-	$(DISTDIR)/main.js
-
+	$(DISTDIR)/main.js \
+	assets_vfsdata.go
 
 all: $(ALL_TARGETS)
 
 clean:
 	-rm -f $(ALL_TARGETS)
 
-$(DISTDIR)/3rdparty.js: $(EXTERNAL_JS)
-	@cat $(EXTERNAL_JS) > $@
+watch:
+	@echo $(INTERNAL_CSS) $(EXTERNAL_CSS) $(EXTERNAL_JS) $(INTERNAL_JS) | tr ' ' '\n' | entr $(MAKE)
 
-$(DISTDIR)/3rdparty.min.js: $(EXTERNAL_JS)
-	@$(CMD_UGLIFY) $(EXTERNAL_JS) > $@
+du:
+	@du -h $(ALL_TARGETS)
+
+
+ifneq ($(BUILD),dev)
+$(DISTDIR)/3rdparty.css: $(EXTERNAL_CSS)
+	$(CMD_CLEANCSS) $(EXTERNAL_CSS) > $@
+
+$(DISTDIR)/3rdparty.js: $(EXTERNAL_JS)
+	$(CMD_UGLIFY) $(EXTERNAL_JS) > $@
 
 $(DISTDIR)/main.js: $(INTERNAL_JS)
-	cat $(INTERNAL_JS) > $@
+	$(CMD_UGLIFY) $(INTERNAL_JS) > $@
 
 $(DISTDIR)/main.css: $(INTERNAL_CSS)
 	$(CMD_NODESASS) --quiet --output-style compressed scss/main.scss > $@
+else
+$(DISTDIR)/3rdparty.js: $(EXTERNAL_JS)
+	@cat $(EXTERNAL_JS) > $@
 
 $(DISTDIR)/3rdparty.css: $(EXTERNAL_CSS)
 	@cat $(EXTERNAL_CSS) > $@
 
-$(DISTDIR)/3rdparty.min.css: $(EXTERNAL_CSS)
-	@$(CMD_CLEANCSS) $(EXTERNAL_CSS) > $@
+$(DISTDIR)/main.js: $(INTERNAL_JS)
+	@cat $(INTERNAL_JS) > $@
 
-size-summary:
-	@du -h $(ALL_TARGETS)
+$(DISTDIR)/main.css: $(INTERNAL_CSS)
+	$(CMD_NODESASS) --quiet scss/main.scss > $@
+endif
 
-watch:
-	@echo $(INTERNAL_CSS) $(EXTERNAL_CSS) $(EXTERNAL_JS) $(INTERNAL_JS) | tr ' ' '\n' | entr make
+# go get -u github.com/shurcooL/vfsgen/cmd/vfsgendev
+assets_vfsdata.go:
+	cd .. && vfsgendev  -source=\"github.com/gvalkov/tailon/frontend\".Assets && mv $@ frontend/
 
 
-.PHONY: all clean watch size-summary
+.PHONY: all clean watch du assets_vfsdata.go

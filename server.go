@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/handlers"
 	"github.com/gvalkov/tailon/cmd"
+	"github.com/gvalkov/tailon/frontend"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"html/template"
 	"log"
@@ -18,7 +19,7 @@ func SetupRoutes(relativeroot string) *http.ServeMux {
 	router := http.NewServeMux()
 
 	sockjsHandler := sockjs.NewHandler(relativeroot+"ws", sockjs.DefaultOptions, wsHandler)
-	staticHandler := noCacheControl(http.FileServer(http.Dir("frontend/dist/")))
+	staticHandler := noCacheControl(http.FileServer(frontend.Assets))
 	staticHandler = http.StripPrefix(relativeroot+"static/", staticHandler)
 
 	router.HandleFunc(relativeroot+"", indexHandler)
