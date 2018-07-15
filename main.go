@@ -52,6 +52,7 @@ const defaultTomlConfig = `
 title = "Tailon file viewer"
 relative-root = "/"
 listen-addr = ":8080"
+allow-download = true
 allow-commands = ["tail", "grep", "sed", "awk"]
 
 [commands]
@@ -153,13 +154,13 @@ func parseFileSpec(spec string) (FileSpec, error) {
 }
 
 type Config struct {
-	RelativeRoot        string
-	BindAddr            string
-	ConfigPath          string
-	WrapLinesInitial    bool
-	TailLinesInitial    int
-	AllowedCommandNames []string
+	RelativeRoot      string
+	BindAddr          string
+	ConfigPath        string
+	WrapLinesInitial  bool
+	TailLinesInitial  int
 	AllowCommandNames []string
+	AllowDownload     bool
 
 	CommandSpecs   map[string]CommandSpec
 	CommandScripts map[string]string
@@ -170,19 +171,22 @@ func makeConfig() *Config {
 	defaults, commandSpecs := parseTomlConfig(defaultTomlConfig)
 
 	config := Config{
-		BindAddr:     defaults.Get("listen-addr").(string),
-		RelativeRoot: defaults.Get("relative-root").(string),
-		CommandSpecs: commandSpecs,
+		BindAddr:      defaults.Get("listen-addr").(string),
+		RelativeRoot:  defaults.Get("relative-root").(string),
+		AllowDownload: defaults.Get("allow-download").(bool),
+		CommandSpecs:  commandSpecs,
 	}
 
 	mapstructure.Decode(defaults.Get("allow-commands"), &config.AllowCommandNames)
 	return &config
 }
 
+var logger *log.Logger
 var config = &Config{}
 
 func main() {
 	config = makeConfig()
+	logger = log.New(os.Stderr, "main: ", log.LstdFlags)
 
 	printHelp := flag.BoolP("help", "h", false, "Show this help message and exit")
 	printConfigHelp := flag.BoolP("help-config", "e", false, "Show config file help and exit")
@@ -190,6 +194,7 @@ func main() {
 	flag.StringVarP(&config.BindAddr, "bind", "b", config.BindAddr, "Listen on the specified address and port")
 	flag.StringVarP(&config.ConfigPath, "config", "c", "", "")
 	flag.StringVarP(&config.RelativeRoot, "relative-root", "r", config.RelativeRoot, "webapp relative root")
+	flag.BoolVarP(&config.AllowDownload, "allow-download", "a", config.AllowDownload, "allow file downloads")
 	flag.Parse()
 
 	flag.Usage = func() {
@@ -235,9 +240,12 @@ func main() {
 		config.CommandScripts[cmd] = values.Default
 	}
 
-	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
-	logger.Printf("Server is starting, relative-root: %s, bind-addr: %s\n", config.RelativeRoot, config.BindAddr)
+	logger.Print("Generate initial file listing")
+	createListing(config.FileSpecs)
 
-	server := SetupServer(config, logger)
+	loggerHtml := log.New(os.Stdout, "http: ", log.LstdFlags)
+	loggerHtml.Printf("Server start, relative-root: %s, bind-addr: %s\n", config.RelativeRoot, config.BindAddr)
+
+	server := SetupServer(config, loggerHtml)
 	server.ListenAndServe()
 }

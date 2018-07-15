@@ -55,10 +55,16 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func downloadHandler(w http.ResponseWriter, r *http.Request) {
+	if !config.AllowDownload {
+		http.Error(w, "downloads forbidden by server", http.StatusForbidden)
+		return
+	}
+
 	path := r.URL.Query()["path"][0]
 	if !fileAllowed(path) {
 		log.Printf("warn: attempt to access unknown file: %s", path)
 		http.Error(w, "unknown file", http.StatusNotFound)
+		return
 	}
 	http.ServeFile(w, r, path)
 }
