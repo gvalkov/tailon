@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestRelativeRoot(t *testing.T) {
@@ -57,6 +58,8 @@ func TestFrontendMessage(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// TODO: Figure out something better than sleeping.
+	time.Sleep(250 * time.Millisecond)
 	procs := getChildProcs()
 	if len(procs) != 1 {
 		t.Fatal(procs)
@@ -67,6 +70,7 @@ func TestFrontendMessage(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	time.Sleep(250 * time.Millisecond)
 	procs = getChildProcs()
 	if len(procs) != 2 {
 		t.Fatal(procs)
@@ -77,6 +81,7 @@ func TestFrontendMessage(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	time.Sleep(250 * time.Millisecond)
 	procs = getChildProcs()
 	if len(procs) != 1 {
 		t.Fatal(procs)
