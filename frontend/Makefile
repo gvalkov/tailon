@@ -1,6 +1,6 @@
-CMD_TYPESCRIPT := node_modules/typescript/bin/tsc
-CMD_POSTCSS    := node_modules/postcss-cli/bin/postcss
+CMD_CLEANCSS   := node_modules/clean-css-cli/bin/cleancss
 CMD_NODESASS   := node_modules/node-sass/bin/node-sass
+CMD_UGLIFY	   := node_modules/uglify-js/bin/uglifyjs
 
 DISTDIR ?= dist
 
@@ -26,7 +26,9 @@ INTERNAL_CSS := \
 
 ALL_TARGETS := \
 	$(DISTDIR)/3rdparty.js \
+	$(DISTDIR)/3rdparty.min.js \
 	$(DISTDIR)/3rdparty.css \
+	$(DISTDIR)/3rdparty.min.css \
 	$(DISTDIR)/main.css \
 	$(DISTDIR)/main.js
 
@@ -39,6 +41,9 @@ clean:
 $(DISTDIR)/3rdparty.js: $(EXTERNAL_JS)
 	@cat $(EXTERNAL_JS) > $@
 
+$(DISTDIR)/3rdparty.min.js: $(EXTERNAL_JS)
+	@$(CMD_UGLIFY) $(EXTERNAL_JS) > $@
+
 $(DISTDIR)/main.js: $(INTERNAL_JS)
 	cat $(INTERNAL_JS) > $@
 
@@ -46,10 +51,16 @@ $(DISTDIR)/main.css: $(INTERNAL_CSS)
 	$(CMD_NODESASS) --quiet --output-style compressed scss/main.scss > $@
 
 $(DISTDIR)/3rdparty.css: $(EXTERNAL_CSS)
-	@cat $? > $@
+	@cat $(EXTERNAL_CSS) > $@
+
+$(DISTDIR)/3rdparty.min.css: $(EXTERNAL_CSS)
+	@$(CMD_CLEANCSS) $(EXTERNAL_CSS) > $@
+
+size-summary:
+	@du -h $(ALL_TARGETS)
 
 watch:
 	@echo $(INTERNAL_CSS) $(EXTERNAL_CSS) $(EXTERNAL_JS) $(INTERNAL_JS) | tr ' ' '\n' | entr make
 
 
-.PHONY: all clean watch
+.PHONY: all clean watch size-summary
