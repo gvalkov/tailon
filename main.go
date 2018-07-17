@@ -224,10 +224,10 @@ func main() {
 	flag.Parse()
 
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, strings.TrimLeft(scriptDescription, "\n"))
+		fmt.Fprintln(os.Stdout, strings.TrimLeft(scriptDescription, "\n"))
 		flag.PrintDefaults()
-		fmt.Fprintln(os.Stderr, strings.TrimRight(scriptEpilog, "\n"))
-		os.Exit(2)
+		fmt.Fprintln(os.Stdout, strings.TrimRight(scriptEpilog, "\n"))
+		os.Exit(0)
 	}
 
 	if *printHelp {
@@ -236,7 +236,7 @@ func main() {
 	}
 
 	if *printConfigHelp {
-		fmt.Fprintf(os.Stderr, "%s\n\n%s\n", strings.Trim(configFileHelp, "\n"), strings.Trim(defaultTomlConfig, "\n"))
+		fmt.Fprintf(os.Stdout, "%s\n\n%s\n", strings.Trim(configFileHelp, "\n"), strings.Trim(defaultTomlConfig, "\n"))
 		os.Exit(0)
 	}
 
