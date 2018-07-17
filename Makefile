@@ -1,5 +1,9 @@
 BUILD ?= prod
 
+test:
+	go test -v
+	cd tests && pytest -v
+
 frontend:
 	cd frontend && $(MAKE) clean ; $(MAKE) BUILD=$(BUILD)
 
@@ -14,4 +18,4 @@ README.md:
 	sed -i 's/[ \t]*$$//' $@
 
 
-.PHONY: frontend frontend-watch docker-build README.md
+.PHONY: test frontend frontend-watch docker-build README.md

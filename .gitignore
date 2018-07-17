@@ -2,6 +2,7 @@
 node_modules/
 /tailon
 /gin-bin
+.pytest_cache
 
 ### Editors ###
 *~
@@ -26,4 +27,3 @@ node_modules/
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-
