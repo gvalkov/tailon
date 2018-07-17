@@ -1,8 +1,8 @@
-[![Build Status](https://img.shields.io/travis/gvalkov/tailon-next.svg)](https://travis-ci.com/gvalkov/tailon-next)
-[![GoDoc](https://godoc.org/github.com/gvalkov/tailon-next?status.svg)](https://godoc.org/github.com/gvalkov/tailon-next)
-[![Go Report Card](https://goreportcard.com/badge/github.com/gvalkov/tailon-next)](https://goreportcard.com/report/github.com/gvalkov/tailon-next)
-[![Apache License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/gvalkov/tailon-next/blob/master/LICENSE)
-[![GitHub release](https://img.shields.io/github/release/gvalkov/tailon-next.svg)](https://github.com/gvalkov/tailon-next/releases)
+[![Build Status](https://img.shields.io/travis/gvalkov/tailon.svg)](https://travis-ci.com/gvalkov/tailon)
+[![GoDoc](https://godoc.org/github.com/gvalkov/tailon?status.svg)](https://godoc.org/github.com/gvalkov/tailon)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gvalkov/tailon)](https://goreportcard.com/report/github.com/gvalkov/tailon)
+[![Apache License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/gvalkov/tailon/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/gvalkov/tailon.svg)](https://github.com/gvalkov/tailon/releases)
 
 # Tailon
 
@@ -27,7 +27,7 @@ What sets tailon apart from other similar projects is:
 Download a build for your platform from the [releases] page or install using `go get`:
 
 ```
-go get -u github.com/gvalkov/tailon-next
+go get -u github.com/gvalkov/tailon
 ```
 
 A docker image is also available:
@@ -133,7 +133,7 @@ port. Basic and digest authentication are under development.
 
 ## What about the other tailon project?
 
-Tailon-next is a full rewrite of the original [tailon] with the following goals in mind:
+This project is a full rewrite of the original [tailon] with the following goals in mind:
 
 * Easier maintenance for the maintainer.
 * Remove unwanted features and fix poor design choices.
