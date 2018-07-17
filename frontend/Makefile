@@ -1,6 +1,6 @@
 CMD_CLEANCSS   := node_modules/clean-css-cli/bin/cleancss
 CMD_NODESASS   := node_modules/node-sass/bin/node-sass
-CMD_UGLIFY	   := node_modules/uglify-js/bin/uglifyjs
+CMD_UGLIFY     := node_modules/uglify-js/bin/uglifyjs
 
 BUILD ?= prod
 DISTDIR ?= dist
