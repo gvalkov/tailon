@@ -131,6 +131,30 @@ By default, tailon is accessible to anyone who knows the server address and
 port. Basic and digest authentication are under development.
 
 
+## Development
+
+### Frontend
+
+The web interface is a written in plain ES5 with the help of some Vue.js. A
+simple makefile is used to bundle and compress the frontend assets. To work
+on the frontend, make sure you're building with the `dev` build tag:
+
+```
+go build -tags dev
+```
+
+This will ensure that the `tailon` binary is reading assets from the
+`frontend/dist` directory instead of from `frontend/assets_vfsdata.go`. To
+compile the web assets, use `make all` or `make all BUILD=dev` in case you want
+to simply concatenate files instead of minify-ing them. You may also use `make
+watch` to let make update the files as you work.
+
+### Tests
+
+The project has unit-tests, which you can run with `go test` and integration
+tests which you can run with `cd tests; pytest` (after reading
+`tests/README.md`). You can also run both with `make test`.
+
 ## What about the other tailon project?
 
 This project is a full rewrite of the original [tailon] with the following goals in mind:
@@ -147,10 +171,6 @@ In terms of tech, the following has changed:
 * Simplified asset pipeline (a short Makefile).
 * Config file is now toml.
 * Fully self contained
-
-## Development
-
-TODO
 
 
 ## Similar Projects
