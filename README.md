@@ -19,12 +19,12 @@ tail -f | sed
 What sets tailon apart from other similar projects is:
 
 * Fully self-contained executable.
-* Small footprint. The tailon executable is 2.5MB in size and uses 10MB of RSS.
+* Small footprint. The tailon executable sits at 2.5MB in size and uses 10MB of RSS.
 * Responsive and minimal user-interface.
 
 ## Install
 
-Download a build for your platform from [releases] or fetch it using `go get`:
+Download a build for your platform from the [releases] page or install using `go get`:
 
 ```
 go get -u github.com/gvalkov/tailon-next
@@ -38,19 +38,30 @@ docker run --rm gvalkov/tailon --help
 
 ## Usage
 
-Tailon is a command-line program that spawns a local HTTP server that serves
-files that you specify. It can be configured from its command-line interface or
-through the convenience of a [toml] config file.
+Tailon is a command-line program that spawns a local HTTP server, which in turn
+streams the output of commands such as `tail` and `grep`. It can be configured
+from its command-line interface or through the convenience of a [toml] config
+file.
 
-To get started, run tailon with the list of files that you wish to monitor:
+To get started, run tailon with the list of files that you wish to monitor.
 
 ```
-tailon /var/log/apache/access.log "glob,/var/log/nginx/*"
+tailon /var/log/apache/access.log /var/log/apache/error.log /var/log/messages
 ```
 
-Tailon can serve single-files, globs or whole directory trees. Tailon’s
+Each argument can be a file, glob or a directory. The following examples
+illustrate how these are used:
+
+```
+# Serve all files matched by a glob. Glob arguments need to be quoted to
+# prevent shell expansion.
+tailon "glob,/var/log/apache/*.log*"
+```
+
+Tailon can serve single files, globs or whole directory trees. Tailon’s
 server-side functionality is summarized entirely in its help message:
 
+[//]: # (BEGIN HELP)
 ```
 Usage: tailon [options] -c <config file>
 Usage: tailon [options] <filespec> [<filespec> ...]
@@ -91,6 +102,7 @@ Example usage:
 For information on usage through the configuration file, please refer to the
 '--help-config' option.
 ```
+[//]: # (END HELP)
 
 ## Security
 
