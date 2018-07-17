@@ -7,6 +7,7 @@ import (
 	"github.com/pelletier/go-toml"
 	flag "github.com/spf13/pflag"
 	"log"
+	"net"
 	"os"
 	"strings"
 )
@@ -62,7 +63,7 @@ more configurability than the command-line interface.
   # The root of the web application.
   relative-root = "/"
 
-  # The address to listen on.
+  # The address to listen on. Can be an address:port combination or an unix socket.
   listen-addr = ":8080"
 
   # Allow download of know files (only those matched by a filespec).
@@ -278,5 +279,21 @@ func main() {
 	loggerHTML.Printf("Server start, relative-root: %s, bind-addr: %s\n", config.RelativeRoot, config.BindAddr)
 
 	server := setupServer(config, loggerHTML)
-	server.ListenAndServe()
+
+	if strings.Contains(config.BindAddr, ":") {
+		server.ListenAndServe()
+	} else {
+		os.Remove(config.BindAddr)
+
+		unixAddr, _ := net.ResolveUnixAddr("unix", config.BindAddr)
+		unixListener, err := net.ListenUnix("unix", unixAddr)
+		unixListener.SetUnlinkOnClose(true)
+
+		if err != nil {
+			panic(err)
+		}
+
+		defer unixListener.Close()
+		server.Serve(unixListener)
+	}
 }
