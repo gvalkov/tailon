@@ -31,12 +31,17 @@ file. The file name in the UI can be overwritten with the 'alias=' specifier.
 
 The 'glob' filespec evaluates to the list of files that match a shell file
 name pattern. The pattern is evaluated each time the file list is refreshed.
-The 'alias=' specifier overwrites the parent directory of each matched file.
+An 'alias' specifier overwrites the parent directory of each matched file in
+the UI. Note that quoting is necessary to prevent shell expansion.
+
+  tailon "glob,/var/log/apache/*.log" "glob,alias=apache,/var/log/apache/*.log"
 
 The 'dir' specifier evaluates to all files in a directory.
 
+  tailon dir,/var/log/apache
+
 The "group=" specifier sets the group in which files appear in the file
-dropdown of the toolbar.
+dropdown of the UI.
 
 Example usage:
   tailon file1.txt file2.txt file3.txt

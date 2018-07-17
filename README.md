@@ -49,17 +49,10 @@ To get started, run tailon with the list of files that you wish to monitor.
 tailon /var/log/apache/access.log /var/log/apache/error.log /var/log/messages
 ```
 
-Each argument can be a file, glob or a directory. The following examples
-illustrate how these are used:
-
-```
-# Serve all files matched by a glob. Glob arguments need to be quoted to
-# prevent shell expansion.
-tailon "glob,/var/log/apache/*.log*"
-```
-
 Tailon can serve single files, globs or whole directory trees. Tailon’s
 server-side functionality is summarized entirely in its help message:
+
+[//]: # (run "make README.md" to update the next section with the output of tailon --help)
 
 [//]: # (BEGIN HELP)
 ```
@@ -87,12 +80,17 @@ file. The file name in the UI can be overwritten with the 'alias=' specifier.
 
 The 'glob' filespec evaluates to the list of files that match a shell file
 name pattern. The pattern is evaluated each time the file list is refreshed.
-The 'alias=' specifier overwrites the parent directory of each matched file.
+An 'alias' specifier overwrites the parent directory of each matched file in
+the UI. Note that quoting is necessary to prevent shell expansion.
+
+  tailon "glob,/var/log/apache/*.log" "glob,alias=apache,/var/log/apache/*.log"
 
 The 'dir' specifier evaluates to all files in a directory.
 
+  tailon dir,/var/log/apache
+
 The "group=" specifier sets the group in which files appear in the file
-dropdown of the toolbar.
+dropdown of the UI.
 
 Example usage:
   tailon file1.txt file2.txt file3.txt
@@ -133,7 +131,7 @@ By default, tailon is accessible to anyone who knows the server address and
 port. Basic and digest authentication are under development.
 
 
-## What about the other tailon project.
+## What about the other tailon project?
 
 Tailon-next is a full rewrite of the original [tailon] with the following goals in mind:
 
