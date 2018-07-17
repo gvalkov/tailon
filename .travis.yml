@@ -12,6 +12,9 @@ git:
 script:
   - go test -v
 
+install:
+  - go get -t ./...
+
 branches:
   only:
     - master
