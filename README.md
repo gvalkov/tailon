@@ -1,10 +1,8 @@
-[![Build Status](https://img.shields.io/travis/gvalkov/tailon.svg)](https://travis-ci.com/gvalkov/tailon)
-[![GoDoc](https://godoc.org/github.com/gvalkov/tailon?status.svg)](https://godoc.org/github.com/gvalkov/tailon)
-[![Go Report Card](https://goreportcard.com/badge/github.com/gvalkov/tailon)](https://goreportcard.com/report/github.com/gvalkov/tailon)
-[![Apache License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/gvalkov/tailon/blob/master/LICENSE)
-[![GitHub release](https://img.shields.io/github/release/gvalkov/tailon.svg)](https://github.com/gvalkov/tailon/releases)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/190997/42879022-6d5915fc-8a8f-11e8-8fe6-903c06bd52a9.png?raw=True" width="450px">
+</p>
 
-# Tailon
+# Tailon [![Build Status](https://travis-ci.com/gvalkov/tailon.svg?branch=master)](https://travis-ci.com/gvalkov/tailon) [![GoDoc](https://godoc.org/github.com/gvalkov/tailon?status.svg)](https://godoc.org/github.com/gvalkov/tailon) [![Go Report Card](https://goreportcard.com/badge/github.com/gvalkov/tailon)](https://goreportcard.com/report/github.com/gvalkov/tailon) [![Apache License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/gvalkov/tailon/blob/master/LICENSE) [![GitHub release](https://img.shields.io/github/release/gvalkov/tailon.svg)](https://github.com/gvalkov/tailon/releases)
 
 Tailon is a webapp for looking at and searching through files and streams. In a
 nutshell, it is a fancy web wrapper around the following commands:
@@ -139,8 +137,8 @@ port. Basic and digest authentication are under development.
 ### Frontend
 
 The web interface is a written in plain ES5 with the help of some Vue.js. A
-simple makefile is used to bundle and compress the frontend assets. To work
-on the frontend, make sure you're building with the `dev` build tag:
+simple makefile is used to bundle and compress the frontend assets. To work on
+the frontend, make sure you're building with the `dev` build tag:
 
 ```
 go build -tags dev
@@ -149,14 +147,64 @@ go build -tags dev
 This will ensure that the `tailon` binary is reading assets from the
 `frontend/dist` directory instead of from `frontend/assets_vfsdata.go`. To
 compile the web assets, use `make all` or `make all BUILD=dev` in case you want
-to simply concatenate files instead of minify-ing them. You may also use `make
-watch` to let make update the files as you work.
+to simply concatenate files instead of also compressing them.
 
-### Tests
+The `make watch` goal can be used to continuously update the bundles as you make
+changes to the sources.
+
+Note that the minified frontend bundles are committed in order to avoid people
+wanting to work only on the backend from having to pull the full `node_modules`.
+
+
+### Backend
+
+The backend is written in straightforward go that tries to do as much as
+possible using only the standard library.
+
+
+### TODO:
+
+* Directory serving is not implemented yet.
+
+* User specified TOML configuration files.
+
+* Basic and digest authentication.
+
+* Add a 'command' filespec - e.g. `"command,journalctl -u nginx"`.
+
+* Better configuration dialog.
+
+* Add interface themes - e.g. light, dark and solarized.
+
+* Add ability to change font family and size.
+
+* Windows support (can use one of the tail implementations in go)
+
+* Implement [wtee].
+
+* Handling of stderr!
+
+
+### Testing
 
 The project has unit-tests, which you can run with `go test` and integration
-tests which you can run with `cd tests; pytest` (after reading
-`tests/README.md`). You can also run both with `make test`.
+tests which you can run with `cd tests; pytest`. Alternatively, you can run both
+with `make test`.
+
+The integration tests are written in Python and use `pytest` and `aiohttp` to
+interact with a running `tailon` instance. To run the integration tests, you
+first need to install the needed dependencies:
+
+```shell
+# Option 1: Using a virtualenv
+python3 -m venv path/to/venv
+source path/to/venv/bin/activate
+python3 -m pip install -r tests/requirements.txt
+
+# Option 2: User site-packages
+python3 -m pip install --user -r tests/requirements.txt
+```
+
 
 ## What about the other tailon project?
 
