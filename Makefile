@@ -1,5 +1,9 @@
 BUILD ?= prod
 
+dev:
+	go build -tags dev
+	$(MAKE) frontend BUILD=dev
+
 test:
 	go test -v
 	cd tests && pytest -v
@@ -8,7 +12,7 @@ frontend:
 	cd frontend && $(MAKE) clean ; $(MAKE) BUILD=$(BUILD)
 
 frontend-watch:
-	cd frontend && $(MAKE) BUILD=$(BUILD)
+	cd frontend && $(MAKE) watch BUILD=$(BUILD)
 
 docker-build:
 	sudo docker build -t gvalkov/tailon .

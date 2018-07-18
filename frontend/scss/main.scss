@@ -352,6 +352,18 @@ input::placeholder {
       margin: 0;
   }
 
+  .multiselect__option--group {
+      background: $tailon-toolbar-input-background-color;
+      color: #c5c8c6;
+      font-weight: bold;
+  }
+
+  .multiselect__option--selected {
+      background: lighten($tailon-toolbar-input-background-color, 5%);
+      color: #c5c8c6;
+      font-weight: inherit;
+  }
+
   .multiselect__content-wrapper {
       border: 0;
       border-radius: 0;
