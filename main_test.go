@@ -16,12 +16,12 @@ func TestCliFileSpec(t *testing.T) {
 		t.Fatalf("%s != %s", b, res)
 	}
 
-	a, b = "glob,alias=2,/var/log/*.log", FileSpec{"/var/log/*.log", "glob", "2", ""}
+	a, b = "alias=2,/var/log/*.log", FileSpec{"/var/log/*.log", "glob", "2", ""}
 	if res, err := parseFileSpec(a); err != nil || res != b {
 		t.Fatalf("%s != %s", b, res)
 	}
 
-	a, b = "dir,alias=1,group=\"a b\",/var/log/", FileSpec{"/var/log/", "dir", "1", "a b"}
+	a, b = "alias=1,group=\"a b\",/var/log/", FileSpec{"/var/log/", "dir", "1", "a b"}
 	if res, err := parseFileSpec(a); err != nil || res != b {
 		t.Fatalf("%s != %s", b, res)
 	}
@@ -36,7 +36,7 @@ func getAliases(entries []*ListEntry) []string {
 }
 
 func TestListingWildcard(t *testing.T) {
-	spec, _ := parseFileSpec("glob,testdata/ex1/var/log/*.log")
+	spec, _ := parseFileSpec("testdata/ex1/var/log/*.log")
 	lst := createListing([]FileSpec{spec})
 
 	if len(lst["__default__"]) != 4 {
@@ -48,7 +48,7 @@ func TestListingWildcard(t *testing.T) {
 		t.Fatal()
 	}
 
-	spec, _ = parseFileSpec("glob,alias=logs,testdata/ex1/var/log/*.log")
+	spec, _ = parseFileSpec("alias=logs,testdata/ex1/var/log/*.log")
 	lst = createListing([]FileSpec{spec})
 
 	aliases = getAliases(lst["__default__"])

@@ -14,6 +14,7 @@ docker-build:
 	sudo docker build -t gvalkov/tailon .
 
 README.md:
+	go build
 	ed $@ <<< $$'/BEGIN HELP/+2,/END HELP/-2d\n/BEGIN HELP/+1r !./tailon --help 2>&1\n,w'
 	sed -i 's/[ \t]*$$//' $@
 

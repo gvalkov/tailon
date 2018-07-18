@@ -23,30 +23,32 @@ const scriptEpilog = `
 Tailon can be configured through a config file or with command-line flags.
 
 The command-line interface expects one or more filespec arguments, which
-specify the files or directories to be served. The expected format is:
+specify the files to be served. The expected format is:
 
-  [[glob|dir|file],alias=name,group=name,]<path>
+  [alias=name,group=name]<spec>
 
-The default filespec is 'file' and points to a single, possibly non-existent
-file. The file name in the UI can be overwritten with the 'alias=' specifier.
+where <spec> can be a file name, glob or directory. The optional 'alias='
+and 'group=' specifiers change the display name of the files in the UI and
+the group in which they appear.
 
-The 'glob' filespec evaluates to the list of files that match a shell file
-name pattern. The pattern is evaluated each time the file list is refreshed.
-An 'alias' specifier overwrites the parent directory of each matched file in
-the UI. Note that quoting is necessary to prevent shell expansion.
+A file specifier points to a single, possibly non-existent file. The file
+name in the UI can be overwritten with 'alias='. For example:
 
-  tailon "glob,/var/log/apache/*.log" "glob,alias=apache,/var/log/apache/*.log"
+  tailon alias=error.log,/var/log/apache/error.log
 
-The 'dir' specifier evaluates to all files in a directory.
+A glob evaluates to the list of files that match a shell file name pattern.
+The pattern is evaluated each time the file list is refreshed. An 'alias='
+specifier overwrites the parent directory of each matched file in the UI.
 
-  tailon dir,/var/log/apache
+  tailon "/var/log/apache/*.log" "alias=nginx,/var/log/nginx/*.log"
 
-The "group=" specifier sets the group in which files appear in the file
-dropdown of the UI.
+If a directory is given, all files under it are served recursively.
+
+  tailon /var/log/apache/ /var/log/nginx/
 
 Example usage:
   tailon file1.txt file2.txt file3.txt
-  tailon alias=messages,/var/log/messages "glob:/var/log/*.log"
+  tailon alias=messages,/var/log/messages "/var/log/*.log"
   tailon -b localhost:8080 -c config.toml
 
 For information on usage through the configuration file, please refer to the
@@ -146,21 +148,32 @@ type FileSpec struct {
 }
 
 // Parse a string into a filespec. Example inputs are:
-//   file,alias=1,group=2,/var/log/messages
-//   /var/log/messages
-//   glob,/var/log/*
+//   alias=1,group=2,/var/log/messages
+//   /var/log/
+//   /var/log/*
 func parseFileSpec(spec string) (FileSpec, error) {
 	var filespec FileSpec
+	var path string
 	parts := strings.Split(spec, ",")
 
-	// If no specifiers are given, default is file.
 	if length := len(parts); length == 1 {
-		return FileSpec{spec, "file", "", ""}, nil
+		path = parts[0]
+	} else {
+		// The last part is the path. We'll probably need a more robust
+		// solution in the future.
+		path, parts = parts[len(parts)-1], parts[:len(parts)-1]
 	}
 
-	// The last part is the path. We'll probably need a more robust
-	// solution in the future.
-	path, parts := parts[len(parts)-1], parts[:len(parts)-1]
+	if strings.ContainsAny(path, "*?[]") {
+		filespec.Type = "glob"
+	} else {
+		stat, err := os.Lstat(path)
+		if os.IsNotExist(err) || stat.Mode().IsRegular() {
+			filespec.Type = "file"
+		} else if stat.Mode().IsDir() {
+			filespec.Type = "dir"
+		}
+	}
 
 	for _, part := range parts {
 		if strings.HasPrefix(part, "group=") {
@@ -169,13 +182,7 @@ func parseFileSpec(spec string) (FileSpec, error) {
 			filespec.Group = group
 		} else if strings.HasPrefix(part, "alias=") {
 			filespec.Alias = strings.SplitN(part, "=", 2)[1]
-		} else {
-			switch part {
-			case "file", "dir", "glob":
-				filespec.Type = part
-			}
 		}
-
 	}
 
 	if filespec.Type == "" {

@@ -38,10 +38,11 @@ docker run --rm gvalkov/tailon --help
 
 ## Usage
 
-Tailon is a command-line program that spawns a local HTTP server, which in turn
+Tailon is a command-line program that starts a local HTTP server, which in turn
 streams the output of commands such as `tail` and `grep`. It can be configured
 from its command-line interface or through the convenience of a [toml] config
-file.
+file. Some options, like adding new commands, are only available through the
+configuration file.
 
 To get started, run tailon with the list of files that you wish to monitor.
 
@@ -71,30 +72,32 @@ Tailon is a webapp for looking at and searching through files and streams.
 Tailon can be configured through a config file or with command-line flags.
 
 The command-line interface expects one or more filespec arguments, which
-specify the files or directories to be served. The expected format is:
+specify the files to be served. The expected format is:
 
-  [[glob|dir|file],alias=name,group=name,]<path>
+  [alias=name,group=name]<spec>
 
-The default filespec is 'file' and points to a single, possibly non-existent
-file. The file name in the UI can be overwritten with the 'alias=' specifier.
+where <spec> can be a file name, glob or directory. The optional 'alias='
+and 'group=' specifiers change the display name of the files in the UI and
+the group in which they appear.
 
-The 'glob' filespec evaluates to the list of files that match a shell file
-name pattern. The pattern is evaluated each time the file list is refreshed.
-An 'alias' specifier overwrites the parent directory of each matched file in
-the UI. Note that quoting is necessary to prevent shell expansion.
+A file specifier points to a single, possibly non-existent file. The file
+name in the UI can be overwritten with 'alias='. For example:
 
-  tailon "glob,/var/log/apache/*.log" "glob,alias=apache,/var/log/apache/*.log"
+  tailon alias=error.log,/var/log/apache/error.log
 
-The 'dir' specifier evaluates to all files in a directory.
+A glob evaluates to the list of files that match a shell file name pattern.
+The pattern is evaluated each time the file list is refreshed. An 'alias='
+specifier overwrites the parent directory of each matched file in the UI.
 
-  tailon dir,/var/log/apache
+  tailon "/var/log/apache/*.log" "alias=nginx,/var/log/nginx/*.log"
 
-The "group=" specifier sets the group in which files appear in the file
-dropdown of the UI.
+If a directory is given, all files under it are served recursively.
+
+  tailon /var/log/apache/ /var/log/nginx/
 
 Example usage:
   tailon file1.txt file2.txt file3.txt
-  tailon alias=messages,/var/log/messages "glob:/var/log/*.log"
+  tailon alias=messages,/var/log/messages "/var/log/*.log"
   tailon -b localhost:8080 -c config.toml
 
 For information on usage through the configuration file, please refer to the
