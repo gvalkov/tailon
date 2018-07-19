@@ -2,6 +2,7 @@
 node_modules/
 /tailon
 /gin-bin
+/dist
 .pytest_cache
 
 ### Editors ###

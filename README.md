@@ -16,7 +16,7 @@ tail -f | sed
 
 What sets tailon apart from other similar projects is:
 
-* Fully self-contained executable.
+* Fully self-contained executable. Just download (or build) and run.
 * Small footprint. The tailon executable sits at 2.5MB in size and uses 10MB of RSS.
 * Responsive and minimal user-interface.
 
@@ -126,7 +126,7 @@ r /etc/secrets
 
 The default set of enabled commands - tail, grep and awk - should be safe to
 use. GNU awk is run in [sandbox] mode, which prevents scripts from accessing your
-system, either through the system() builtin or by using input redirection.
+system, either through the `system()` builtin or by using input redirection.
 
 By default, tailon is accessible to anyone who knows the server address and
 port. Basic and digest authentication are under development.
@@ -162,11 +162,11 @@ The backend is written in straightforward go that tries to do as much as
 possible using only the standard library.
 
 
-### TODO:
+### Backlog
 
 * Directory serving is not implemented yet.
 
-* User specified TOML configuration files.
+* User-specified TOML configuration files.
 
 * Basic and digest authentication.
 
@@ -178,11 +178,11 @@ possible using only the standard library.
 
 * Add ability to change font family and size.
 
-* Windows support (can use one of the tail implementations in go)
+* Windows support (can use one of the Go tail implementations).
 
 * Implement [wtee].
 
-* Handling of stderr!
+* Stderr is streamed to the client, but it is not handled at the moment.
 
 
 ### Testing
@@ -210,18 +210,17 @@ python3 -m pip install --user -r tests/requirements.txt
 
 This project is a full rewrite of the original [tailon] with the following goals in mind:
 
-* Easier maintenance for the maintainer.
+* Reduce maintenance overhead (especially on the frontend).
 * Remove unwanted features and fix poor design choices.
-* Learn more.
+* Learn more about Go and Vue.js.
 
 In terms of tech, the following has changed:
 
 * Backend from Python+Tornado to Go.
-* Frontend from a very-custom and specific Typescript solution to a simple ES5 + vue.js
-  (mostly for data-binding).
+* Frontend from a very-custom Typescript solution to a simple ES5 + Vue.js app.
 * Simplified asset pipeline (a short Makefile).
-* Config file is now toml.
-* Fully self contained
+* Config file is now toml based.
+* Fully self-contained executable.
 
 
 ## Similar Projects
@@ -246,7 +245,7 @@ Tailon is released under the terms of the [Apache 2.0 License].
 
 
 [clarity]:   https://github.com/tobi/clarity
-[tailon]:    https://github.com/gvalkov/tailon
+[tailon]:    https://github.com/gvalkov/tailon-legacy
 [wtee]:      https://github.com/gvalkov/wtee
 [toml]:      https://github.com/toml-lang/toml
 [releases]:  https://github.com/gvalkov/tailon-next/releases
