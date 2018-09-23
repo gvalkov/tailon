@@ -367,6 +367,8 @@ input::placeholder {
   .multiselect__content-wrapper {
       border: 0;
       border-radius: 0;
+      width: auto;
+      min-width: 100%;
   }
 }
 
