@@ -55,7 +55,7 @@ server-side functionality is summarized entirely in its help message:
 
 [//]: # (BEGIN HELP)
 ```
-Usage: tailon [options] -c <config file>
+Usage: tailon -c <config file>
 Usage: tailon [options] <filespec> [<filespec> ...]
 
 Tailon is a webapp for looking at and searching through files and streams.

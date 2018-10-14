@@ -15,7 +15,7 @@ import (
 )
 
 const scriptDescription = `
-Usage: tailon [options] -c <config file>
+Usage: tailon -c <config file>
 Usage: tailon [options] <filespec> [<filespec> ...]
 
 Tailon is a webapp for looking at and searching through files and streams.
@@ -210,18 +210,7 @@ type Config struct {
 	FileSpecs      []FileSpec
 }
 
-func makeConfig() *Config {
-	var configContent = defaultTomlConfig
-
-	if config.ConfigPath != "" {
-		if b, err := ioutil.ReadFile(config.ConfigPath); err != nil {
-			fmt.Fprintf(os.Stderr, "Error while reading config file '%s': %s\n", config.ConfigPath, err)
-			os.Exit(1)
-		} else {
-			configContent = string(b)
-		}
-	}
-
+func makeConfig(configContent string) *Config {
 	defaults, commandSpecs := parseTomlConfig(configContent)
 
 	// Convert the list of bind addresses from []interface{} to []string.
@@ -245,7 +234,7 @@ func makeConfig() *Config {
 var config = &Config{}
 
 func main() {
-	config = makeConfig()
+	config = makeConfig(defaultTomlConfig)
 
 	printHelp := flag.BoolP("help", "h", false, "Show this help message and exit")
 	printConfigHelp := flag.BoolP("help-config", "e", false, "Show configuration file help and exit")
@@ -274,6 +263,16 @@ func main() {
 	}
 
 	config.BindAddr = strings.Split(*bindAddr, ",")
+
+	// If a configuration file is specified, read all options from it. This discards all options set on the command-line.
+	if config.ConfigPath != "" {
+		if b, err := ioutil.ReadFile(config.ConfigPath); err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading config file '%s': %s\n", config.ConfigPath, err)
+			os.Exit(1)
+		} else {
+			config = makeConfig(string(b))
+		}
+	}
 
 	// Ensure that relative root is always '/' or '/$arg/'.
 	config.RelativeRoot = "/" + strings.TrimLeft(config.RelativeRoot, "/")
