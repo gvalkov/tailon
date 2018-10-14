@@ -84,10 +84,11 @@ async def logwriter(args):
     coros = []
     for fn in args.files:
         w = writer(fn, gen, lock=lock, rate=args.rate, update_msec=args.update_msec)
+        coros.append(w)
+
         if not args.no_truncate:
             t = truncater(fn, lock=lock, truncate_msec=args.truncate_msec)
-        coros.append(w)
-        coros.append(t)
+            coros.append(t)
 
     await asyncio.gather(*coros)
 
