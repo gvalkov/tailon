@@ -96,7 +96,7 @@ If a directory is given, all files under it are served recursively.
 Example usage:
   tailon file1.txt file2.txt file3.txt
   tailon alias=messages,/var/log/messages "/var/log/*.log"
-  tailon -b localhost:8080 -c config.toml
+  tailon -b localhost:8080,localhost:8081 -c config.toml
 
 For information on usage through the configuration file, please refer to the
 '--help-config' option.

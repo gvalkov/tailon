@@ -3,14 +3,15 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pelletier/go-toml"
 	flag "github.com/spf13/pflag"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
 	"strings"
+	"sync"
 )
 
 const scriptDescription = `
@@ -50,7 +51,7 @@ If a directory is given, all files under it are served recursively.
 Example usage:
   tailon file1.txt file2.txt file3.txt
   tailon alias=messages,/var/log/messages "/var/log/*.log"
-  tailon -b localhost:8080 -c config.toml
+  tailon -b localhost:8080,localhost:8081 -c config.toml
 
 For information on usage through the configuration file, please refer to the
 '--help-config' option.
@@ -66,8 +67,8 @@ more configurability than the command-line interface.
   # The root of the web application.
   relative-root = "/"
 
-  # The address to listen on. Can be an address:port combination or an unix socket.
-  listen-addr = ":8080"
+  # The addresses to listen on. Can be an address:port combination or an unix socket.
+  listen-addr = [":8080"]
 
   # Allow download of know files (only those matched by a filespec).
   allow-download = true
@@ -86,7 +87,7 @@ At startup, tailon loads a default config file. The contents of that file are:
 const defaultTomlConfig = `
   title = "Tailon file viewer"
   relative-root = "/"
-  listen-addr = ":8080"
+  listen-addr = [":8080"]
   allow-download = true
   allow-commands = ["tail", "grep", "sed", "awk"]
 
@@ -197,7 +198,7 @@ func parseFileSpec(spec string) (FileSpec, error) {
 // Config contains all backend and frontend configuration options and relevant state.
 type Config struct {
 	RelativeRoot      string
-	BindAddr          string
+	BindAddr          []string
 	ConfigPath        string
 	WrapLinesInitial  bool
 	TailLinesInitial  int
@@ -223,8 +224,15 @@ func makeConfig() *Config {
 
 	defaults, commandSpecs := parseTomlConfig(configContent)
 
+	// Convert the list of bind addresses from []interface{} to []string.
+	addrsA := defaults.Get("listen-addr").([]interface{})
+	addrsB := make([]string, len(addrsA))
+	for i := range addrsA {
+		addrsB[i] = addrsA[i].(string)
+	}
+
 	config := Config{
-		BindAddr:      defaults.Get("listen-addr").(string),
+		BindAddr:      addrsB,
 		RelativeRoot:  defaults.Get("relative-root").(string),
 		AllowDownload: defaults.Get("allow-download").(bool),
 		CommandSpecs:  commandSpecs,
@@ -237,17 +245,15 @@ func makeConfig() *Config {
 var config = &Config{}
 
 func main() {
-	flag.StringVarP(&config.ConfigPath, "config", "c", "", "")
-	flag.Parse()
-
 	config = makeConfig()
 
 	printHelp := flag.BoolP("help", "h", false, "Show this help message and exit")
 	printConfigHelp := flag.BoolP("help-config", "e", false, "Show configuration file help and exit")
+	bindAddr := flag.StringP("bind", "b", strings.Join(config.BindAddr, ","), "Listen on the specified address and port")
 
-	flag.StringVarP(&config.BindAddr, "bind", "b", config.BindAddr, "Listen on the specified address and port")
 	flag.StringVarP(&config.RelativeRoot, "relative-root", "r", config.RelativeRoot, "webapp relative root")
 	flag.BoolVarP(&config.AllowDownload, "allow-download", "a", config.AllowDownload, "allow file downloads")
+	flag.StringVarP(&config.ConfigPath, "config", "c", "", "")
 	flag.Parse()
 
 	flag.Usage = func() {
@@ -266,6 +272,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "%s\n\n%s\n", strings.Trim(configFileHelp, "\n"), strings.Trim(defaultTomlConfig, "\n"))
 		os.Exit(0)
 	}
+
+	config.BindAddr = strings.Split(*bindAddr, ",")
 
 	// Ensure that relative root is always '/' or '/$arg/'.
 	config.RelativeRoot = "/" + strings.TrimLeft(config.RelativeRoot, "/")
@@ -296,17 +304,27 @@ func main() {
 	log.Print("Generate initial file listing")
 	createListing(config.FileSpecs)
 
+	var wg sync.WaitGroup
+	for _, addr := range config.BindAddr {
+		wg.Add(1)
+		go startServer(config, addr)
+	}
+	wg.Wait()
+
+}
+
+func startServer(config *Config, bindAddr string) {
 	loggerHTML := log.New(os.Stdout, "", log.LstdFlags)
-	loggerHTML.Printf("Server start, relative-root: %s, bind-addr: %s\n", config.RelativeRoot, config.BindAddr)
+	loggerHTML.Printf("Server start, relative-root: %s, bind-addr: %s\n", config.RelativeRoot, bindAddr)
 
-	server := setupServer(config, loggerHTML)
+	server := setupServer(config, bindAddr, loggerHTML)
 
-	if strings.Contains(config.BindAddr, ":") {
+	if strings.Contains(bindAddr, ":") {
 		server.ListenAndServe()
 	} else {
-		os.Remove(config.BindAddr)
+		os.Remove(bindAddr)
 
-		unixAddr, _ := net.ResolveUnixAddr("unix", config.BindAddr)
+		unixAddr, _ := net.ResolveUnixAddr("unix", bindAddr)
 		unixListener, err := net.ListenUnix("unix", unixAddr)
 		unixListener.SetUnlinkOnClose(true)
 

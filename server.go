@@ -35,12 +35,12 @@ func setupRoutes(relativeroot string) *http.ServeMux {
 	return router
 }
 
-func setupServer(config *Config, logger *log.Logger) *http.Server {
+func setupServer(config *Config, addr string, logger *log.Logger) *http.Server {
 	router := setupRoutes(config.RelativeRoot)
 	loggingRouter := handlers.LoggingHandler(os.Stderr, router)
 
 	server := http.Server{
-		Addr:         config.BindAddr,
+		Addr:         addr,
 		Handler:      loggingRouter,
 		ErrorLog:     logger,
 		ReadTimeout:  5 * time.Second,
