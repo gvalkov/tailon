@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pelletier/go-toml"
 	flag "github.com/spf13/pflag"
@@ -209,7 +210,18 @@ type Config struct {
 }
 
 func makeConfig() *Config {
-	defaults, commandSpecs := parseTomlConfig(defaultTomlConfig)
+	var configContent = defaultTomlConfig
+
+	if config.ConfigPath != "" {
+		if b, err := ioutil.ReadFile(config.ConfigPath); err != nil {
+			fmt.Fprintf(os.Stderr, "Error while reading config file '%s': %s\n", config.ConfigPath, err)
+			os.Exit(1)
+		} else {
+			configContent = string(b)
+		}
+	}
+
+	defaults, commandSpecs := parseTomlConfig(configContent)
 
 	config := Config{
 		BindAddr:      defaults.Get("listen-addr").(string),
@@ -225,13 +237,15 @@ func makeConfig() *Config {
 var config = &Config{}
 
 func main() {
+	flag.StringVarP(&config.ConfigPath, "config", "c", "", "")
+	flag.Parse()
+
 	config = makeConfig()
 
 	printHelp := flag.BoolP("help", "h", false, "Show this help message and exit")
 	printConfigHelp := flag.BoolP("help-config", "e", false, "Show configuration file help and exit")
 
 	flag.StringVarP(&config.BindAddr, "bind", "b", config.BindAddr, "Listen on the specified address and port")
-	flag.StringVarP(&config.ConfigPath, "config", "c", "", "")
 	flag.StringVarP(&config.RelativeRoot, "relative-root", "r", config.RelativeRoot, "webapp relative root")
 	flag.BoolVarP(&config.AllowDownload, "allow-download", "a", config.AllowDownload, "allow file downloads")
 	flag.Parse()
