@@ -6,10 +6,10 @@ BUILD ?= prod
 DISTDIR ?= dist
 
 EXTERNAL_JS := \
-	node_modules/vue/dist/vue.js \
+	node_modules/vue/dist/vue.min.js \
 	node_modules/vue-multiselect/dist/vue-multiselect.min.js \
-	node_modules/sockjs-client/dist/sockjs.js \
-	node_modules/html5shiv/dist/html5shiv.js \
+	node_modules/sockjs-client/dist/sockjs.min.js \
+	node_modules/html5shiv/dist/html5shiv.min.js \
 	node_modules/vue-loading-overlay/dist/vue-loading.min.js
 
 EXTERNAL_CSS := \
@@ -58,6 +58,10 @@ $(DISTDIR)/main.js: $(INTERNAL_JS)
 $(DISTDIR)/main.css: $(INTERNAL_CSS)
 	$(CMD_NODESASS) --quiet --output-style compressed scss/main.scss > $@
 else
+
+# Usin the non-minified package disables production mode.
+EXTERNAL_JS := $(EXTERNAL_JS:%/vue.min.js=%/vue.js)
+
 $(DISTDIR)/3rdparty.js: $(EXTERNAL_JS)
 	@cat $(EXTERNAL_JS) > $@
 
