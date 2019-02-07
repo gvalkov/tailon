@@ -53,7 +53,7 @@ $(DISTDIR)/3rdparty.js: $(EXTERNAL_JS)
 	$(CMD_UGLIFY) $(EXTERNAL_JS) > $@
 
 $(DISTDIR)/main.js: $(INTERNAL_JS)
-	$(CMD_UGLIFY) $(INTERNAL_JS) > $@
+	$(CMD_UGLIFY) -c drop_console=true $(INTERNAL_JS) > $@
 
 $(DISTDIR)/main.css: $(INTERNAL_CSS)
 	$(CMD_NODESASS) --quiet --output-style compressed scss/main.scss > $@
