@@ -41,10 +41,10 @@ var app = new Vue({
         },
         downloadLink: function () {
             if (this.file) {
-                var sufficx = 'files/?path=' + this.file.path;
+                var suffix = 'files/?path=' + this.file.path;
                 return endsWith(window.location.pathname, '/') ?
-                    window.location.href + sufficx :
-                    window.location.href.replace(/[^\/]+$/, sufficx);
+                    window.location.href + suffix :
+                    window.location.href.replace(/[^\/]+$/, suffix);
             }
             return '#';
         }
