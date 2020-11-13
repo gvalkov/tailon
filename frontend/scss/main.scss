@@ -1,381 +1,452 @@
 @import 'vars.scss';
-
-
 body {
-  font: 13px/1.5 'Helvetica Neue',Arial,'Liberation Sans',FreeSans,sans-serif;
-  overflow: hidden;
-  height: 100vh;
-  background-color: $tailon-logview-background-color;
-  width: 100%;
+    font: 13px/1.5 'Helvetica Neue', Arial, 'Liberation Sans', FreeSans, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    background-color: $tailon-logview-background-color;
+    width: 100%;
 }
 
 #app {
-  height: 100%;
+    height: 100%;
 }
 
 //----------------------------------------------------------------------------
 // Toolbar styles.
 //----------------------------------------------------------------------------
 #toolbar {
-  width: 100%;
-  background: $tailon-toolbar-background-color;
-
-  padding-top: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  height: 30px;
-
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-
-  align-content: stretch;
-  align-items: center;
+    width: 100%;
+    background: $tailon-toolbar-background-color;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: center;
 }
 
 .toolbar-item {
-  /* height: 100%; */
-  height: 26px;
-  padding-right: 5px;
-  flex: 0 0 auto;
-  order: 0;
-  align-self: flex-start;
+    /* height: 100%; */
+    height: 26px;
+    padding-right: 5px;
+    flex: 0 0 auto;
+    order: 0;
+    align-self: flex-start;
 }
 
 .toolbar-item-fill {
-  flex: 1 0 auto;
+    flex: 1 0 auto;
 }
 
 div #file-select {
-  min-width: 22%;
+    min-width: 22%;
 }
 
 div #command-select {
-  min-width: 120px;
+    min-width: 120px;
 }
 
 #script-input {
-  box-sizing: border-box;
-  box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
-
-  height: 26px;
-
-  background: $tailon-toolbar-input-background-color;
-  padding-right: 30px;
-  position: relative;
-  font-size: 13px;
-
-  input {
-    @extend .toolbar-widget;
-    @extend .toolbar-text;
-    padding-left: 0.5em;
-    height: 100%;
-    width: 100%;
-    text-align: center;
-  }
-
-  div {
-    line-height: 26px;
-    color: #888;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    cursor: hand;
-    display: block;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 22px;
-
-    &:hover {@extend .toolbar-hover;}
-  }
-
-  div + div {
-    right: 22px;
-  }
+    box-sizing: border-box;
+    box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
+    height: 26px;
+    background: $tailon-toolbar-input-background-color;
+    padding-right: 30px;
+    position: relative;
+    font-size: 13px;
+    input {
+        @extend .toolbar-widget;
+        @extend .toolbar-text;
+        padding-left: 0.5em;
+        height: 100%;
+        width: 100%;
+        text-align: center;
+    }
+    div {
+        line-height: 26px;
+        color: #888;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        cursor: hand;
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 22px;
+        &:hover {
+            @extend .toolbar-hover;
+        }
+    }
+    div+div {
+        right: 22px;
+    }
 }
 
 .toolbar-widget {
-  color: #c5c8c6;
-  background: $tailon-toolbar-input-background-color;
-  border: 0;
-  border-radius: 0;
-  box-sizing: border-box;
+    color: #c5c8c6;
+    background: $tailon-toolbar-input-background-color;
+    border: 0;
+    border-radius: 0;
+    box-sizing: border-box;
 }
 
 .toolbar-hover {
-  background-color: lighten($tailon-toolbar-input-background-color, 5%);
+    background-color: lighten($tailon-toolbar-input-background-color, 5%);
 }
 
 .toolbar-text {
-  font-family: $ttfonts;
-  font-size: 13px;
+    font-family: $ttfonts;
+    font-size: 13px;
 }
 
 .button-group {
-  height: 26px;
-  padding-right: 5px;
-
-  a {
-    box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
-    @extend .toolbar-widget;
-
-    float: left;
-    margin-right: 0;
     height: 26px;
-    width: 26px;
-    text-align: center;
-    font-size: 1.5em;
-
-    &:hover {
-      @extend .toolbar-hover;
+    padding-right: 5px;
+    a {
+        box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
+        @extend .toolbar-widget;
+        float: left;
+        margin-right: 0;
+        height: 26px;
+        width: 26px;
+        text-align: center;
+        font-size: 1.5em;
+        &:hover {
+            @extend .toolbar-hover;
+        }
+        &.selected {
+            @extend .toolbar-hover;
+        }
+        &:link,
+        &:visited,
+        &:active {
+            text-decoration: none;
+            outline: none;
+        }
+        svg {
+            width: 1em;
+            fill: #c5c8c6;
+        }
     }
-
-    &.selected {
-      @extend .toolbar-hover;
-    }
-
-    &:link,
-    &:visited,
-    &:active {
-      text-decoration: none;
-      outline: none;
-    }
-
-    svg {
-        width: 1em;
-        fill: #c5c8c6;
-    }
-  }
 }
 
 .toolbar-hidden {
-  position: absolute;
-  right: 0px;
-  top: 5px;
+    position: absolute;
+    right: 0px;
+    top: 5px;
 }
 
 #configuration {
-  position: absolute;
-  top: 5px;
-  right: 15px;
+    position: absolute;
+    top: 5px;
+    right: 15px;
 }
 
 #action-show-settings {
-  position: absolute;
-  top: 5px;
-  right: 15px;
+    position: absolute;
+    top: 5px;
+    right: 15px;
 }
 
 #minimized-action-bar {
-  position: absolute;
-  top: 3px;
-  right: 8px;
+    position: absolute;
+    top: 3px;
+    right: 8px;
 }
 
 @mixin selected-placeholder($color: $tailon-toolbar-input-background-color) {
-  background: $color;
-  text-shadow: none;
+    background: $color;
+    text-shadow: none;
 }
-
 
 //----------------------------------------------------------------------------
 // Log view style.
 //----------------------------------------------------------------------------
 .scrollable {
-  height: 100%;
-  word-break: break-all;
-  white-space: pre;
-  overflow: auto;
+    height: 100%;
+    word-break: break-all;
+    white-space: pre;
+    overflow: auto;
 }
 
 .log-view {
-  font-family: $ttfonts;
-  font-size: $tailon-logview-font-size;
-  line-height: 1.3;
-  padding-top: 2px;
-  color: $tailon-logview-text-color;
-  background-color: $tailon-logview-background-color;
+    font-family: $ttfonts;
+    font-size: $tailon-logview-font-size;
+    line-height: 1.3;
+    padding-top: 2px;
+    color: $tailon-logview-text-color;
+    background-color: $tailon-logview-background-color;
+    .log-entry {
+        display: block;
+    }
+    .log-entry-current {
+        background: $tailon-logview-current-line-background-color;
+    }
+    .log-emergency {
+        background: $tailon-logview-emergency-background-color;
+        color: $tailon-logview-emergency-color;
+    }
+    .log-alert {
+        background: $tailon-logview-alert-background-color;
+        color: $tailon-logview-alert-color;
+    }
+    .log-critical {
+        background: $tailon-logview-critical-background-color;
+        color: $tailon-logview-critical-color;
+    }
+    .log-error {
+        background: $tailon-logview-error-background-color;
+        color: $tailon-logview-error-color;
+    }
+    .log-warning {
+        background: $tailon-logview-warning-background-color;
+        color: $tailon-logview-warning-color;
+    }
+    .log-notice {
+        background: $tailon-logview-notice-background-color;
+        color: $tailon-logview-notice-color;
+    }
+    .log-info {
+        background: $tailon-logview-info-background-color;
+        color: $tailon-logview-info-color;
+    }
+    .log-debug {
+        background: $tailon-logview-debug-background-color;
+        color: $tailon-logview-debug-color;
+    }
+}
 
-  .log-entry {
-    display: block;
-  }
-
-  .log-entry-current {
-    background: $tailon-logview-current-line-background-color;
-  }
-
-  .log-notice {
-    background: $tailon-logview-notice-background-color;
-    color: $tailon-logview-notice-color;
+.badge {
+    display: inline-block;
+    padding: $badge-padding-y $badge-padding-x;
+    font-size: $badge-font-size;
+    font-weight: $badge-font-weight;
+    line-height: 1;
     text-align: center;
-    font-weight: bold;
-  }
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: $badge-border-radius;
+    // Empty badges collapse automatically
+    &:empty {
+        display: none;
+    }
+}
+
+.badge.badge-env,
+.badge.badge-level-all,
+.badge.badge-level-emergency,
+.badge.badge-level-alert,
+.badge.badge-level-critical,
+.badge.badge-level-error,
+.badge.badge-level-warning,
+.badge.badge-level-notice,
+.badge.badge-level-info,
+.badge.badge-level-debug,
+.badge.empty {
+    color: #FFF;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.badge.badge-level-all,
+.box.level-all {
+    background-color: #8A8A8A;
+}
+
+.badge.badge-level-emergency,
+.box.level-emergency {
+    background-color: $tailon-logview-emergency-background-color;
+}
+
+.badge.badge-level-alert,
+.box.level-alert {
+    background-color: $tailon-logview-alert-background-color;
+}
+
+.badge.badge-level-critical,
+.box.level-critical {
+    background-color: $tailon-logview-critical-background-color;
+}
+
+.badge.badge-level-error,
+.box.level-error {
+    background-color: $tailon-logview-error-background-color;
+}
+
+.badge.badge-level-warning,
+.box.level-warning {
+    background-color: $tailon-logview-warning-background-color;
+}
+
+.badge.badge-level-notice,
+.box.level-notice {
+    background-color: $tailon-logview-notice-background-color;
+}
+
+.badge.badge-level-info,
+.box.level-info {
+    background-color: $tailon-logview-info-background-color;
+}
+
+.badge.badge-level-debug,
+.box.level-debug {
+    background-color: $tailon-logview-debug-background-color;
 }
 
 .log-view-wrapped {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
 }
 
-
 .log-view ::selection {
-  @include selected-placeholder();
+    @include selected-placeholder();
 }
 
 input::selection {
-  @include selected-placeholder(darken(#373b41, 40%));
-  color: white;
+    @include selected-placeholder(darken(#373b41, 40%));
+    color: white;
 }
 
 input::placeholder {
-  color: #c5c8c6;
-  font-style: italic;
-  text-align: center;
+    color: #c5c8c6;
+    font-style: italic;
+    text-align: center;
 }
 
 //----------------------------------------------------------------------------
 // Configuration dialog styles
 //----------------------------------------------------------------------------
 #configuration {
-  position: fixed;
-  top: 40px;
-  right: 15px;
-  background: $tailon-toolbar-input-background-color;
-  z-index:9999;
-
-  border: 5px solid $tailon-toolbar-background-color;
-  box-sizing: border-box;
-  box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
-
-  form {
-    padding: 10px;
-    display: table;
-    font-family: $ttfonts;
-    font-size: 14px;
-    color: #c5c8c6;
-  }
-
-  p {
-    display: table-row;
-    /* background-color: $tailon-toolbar-background-color; */
-  }
-
-  label, input {
-    margin-top: 2px;
-    display: table-cell;
-  }
-
-  label {
-    border: none;
-  }
-
-  input {
-    margin-left: 20px;
-    border: none;
-    width: 80px;
-    text-align: right;
-    vertical-align: middle;
-  }
+    position: fixed;
+    top: 40px;
+    right: 15px;
+    background: $tailon-toolbar-input-background-color;
+    z-index: 9999;
+    border: 5px solid $tailon-toolbar-background-color;
+    box-sizing: border-box;
+    box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
+    form {
+        padding: 10px;
+        display: table;
+        font-family: $ttfonts;
+        font-size: 14px;
+        color: #c5c8c6;
+    }
+    p {
+        display: table-row;
+        /* background-color: $tailon-toolbar-background-color; */
+    }
+    label,
+    input {
+        margin-top: 2px;
+        display: table-cell;
+    }
+    label {
+        border: none;
+    }
+    input {
+        margin-left: 20px;
+        border: none;
+        width: 80px;
+        text-align: right;
+        vertical-align: middle;
+    }
 }
 
-.tailon-dark  {
-  .multiselect {
-      text-align: center;
-      font-family: $ttfonts;
-      line-height: 26px;
-      font-size: 13px;
-      color: #c5c8c6;
-      box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
-      min-height: inherit;
-  }
-
-  .multiselect__tags {
-      min-height: 0;
-      background: none;
-      border: 0;
-      border-radius: 0;
-      padding: 0 1px;
-  }
-
-  .multiselect__content {
-      background-color: $tailon-toolbar-input-background-color;
-  }
-
-  .multiselect__option {
-      padding: 10px 0 10px 10px;
-      min-height: 20px;
-      line-height: 12px;
-      vertical-align: middle;
-      cursor: pointer;
-      white-space: nowrap;
-      text-align: left;
-  }
-
-  .multiselect__option--highlight {
-      background: #41b883;
-      /* outline: none; */
-      /* color: #fff; */
-      background: lighten($tailon-toolbar-input-background-color, 5%);
-  }
-
-  /* .multiselect__option--highlight:after { */
-  /*     content: attr(data-select); */
-  /*     background: lighten($tailon-toolbar-input-background-color, 5%); */
-  /*     color: #c5c8c6; */
-  /* } */
-
-  .multiselect__select {
-      position: absolute;
-      width: 40px;
-      height: 25px;
-      //right: -4px;
-      top: 1px;
-      padding: 4px 0px;
-      text-align: center;
-      z-index: 1;
-  }
-
-  .multiselect__input {
-      line-height: inherit;
-  }
-
-  .multiselect__single {
-      line-height: inherit;
-  }
-
-  .multiselect__input, .multiselect__single {
-      font-size: 13px;
-      background-color: $tailon-toolbar-input-background-color;
-      border: none;
-      border-radius: 0;
-      margin: 0;
-  }
-
-  .multiselect__option--group {
-      background: $tailon-toolbar-input-background-color;
-      color: #c5c8c6;
-      font-weight: bold;
-  }
-
-  .multiselect__option--selected {
-      background: lighten($tailon-toolbar-input-background-color, 5%);
-      color: #c5c8c6;
-      font-weight: inherit;
-  }
-
-  .multiselect__content-wrapper {
-      border: 0;
-      border-radius: 0;
-      width: auto;
-      min-width: 100%;
-  }
+.tailon-dark {
+    .multiselect {
+        text-align: center;
+        font-family: $ttfonts;
+        line-height: 26px;
+        font-size: 13px;
+        color: #c5c8c6;
+        box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
+        min-height: inherit;
+    }
+    .multiselect__tags {
+        min-height: 0;
+        background: none;
+        border: 0;
+        border-radius: 0;
+        padding: 0 1px;
+    }
+    .multiselect__content {
+        background-color: $tailon-toolbar-input-background-color;
+    }
+    .multiselect__option {
+        padding: 10px 0 10px 10px;
+        min-height: 20px;
+        line-height: 12px;
+        vertical-align: middle;
+        cursor: pointer;
+        white-space: nowrap;
+        text-align: left;
+    }
+    .multiselect__option--highlight {
+        background: #41b883;
+        /* outline: none; */
+        /* color: #fff; */
+        background: lighten($tailon-toolbar-input-background-color, 5%);
+    }
+    /* .multiselect__option--highlight:after { */
+    /*     content: attr(data-select); */
+    /*     background: lighten($tailon-toolbar-input-background-color, 5%); */
+    /*     color: #c5c8c6; */
+    /* } */
+    .multiselect__select {
+        position: absolute;
+        width: 40px;
+        height: 25px;
+        //right: -4px;
+        top: 1px;
+        padding: 4px 0px;
+        text-align: center;
+        z-index: 1;
+    }
+    .multiselect__input {
+        line-height: inherit;
+    }
+    .multiselect__single {
+        line-height: inherit;
+    }
+    .multiselect__input,
+    .multiselect__single {
+        font-size: 13px;
+        background-color: $tailon-toolbar-input-background-color;
+        border: none;
+        border-radius: 0;
+        margin: 0;
+    }
+    .multiselect__option--group {
+        background: $tailon-toolbar-input-background-color;
+        color: #c5c8c6;
+        font-weight: bold;
+    }
+    .multiselect__option--selected {
+        background: lighten($tailon-toolbar-input-background-color, 5%);
+        color: #c5c8c6;
+        font-weight: inherit;
+    }
+    .multiselect__content-wrapper {
+        border: 0;
+        border-radius: 0;
+        width: auto;
+        min-width: 100%;
+    }
 }
 
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .3s;
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity .3s;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+
+.fade-enter,
+.fade-leave-to
+/* .fade-leave-active below version 2.1.8 */
+
+{
+    opacity: 0;
 }

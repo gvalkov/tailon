@@ -1,7 +1,7 @@
 function formatBytes(size) {
     var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     var i = 0;
-    while(size >= 1024) {
+    while (size >= 1024) {
         size /= 1024;
         ++i;
     }
@@ -31,7 +31,7 @@ var escape_entity_map = {
 
 // This is the escapeHtml function from mustache.js.
 function escapeHtml(str) {
-    return String(str).replace(/[&<>\/]/g, function (s) {
+    return String(str).replace(/[&<>\/]/g, function(s) {
         return escape_entity_map[s];
     });
 }
@@ -52,5 +52,36 @@ function parseQueryString(str) {
         }
     });
 
+    return res;
+}
+
+function lineTypeLog(line) {
+    var n1 = line.search(".EMERGENCY: ");
+    var n2 = line.search(".ALERT: ");
+    var n3 = line.search(".CRITICAL: ");
+    var n4 = line.search(".ERROR: ");
+    var n5 = line.search(".WARNING: ");
+    var n6 = line.search(".NOTICE: ");
+    var n7 = line.search(".INFO: ");
+    var n8 = line.search(".DEBUG: ");
+    if (n1 >= 0) {
+        var res = "EMERGENCY";
+    } else if (n2 >= 0) {
+        var res = "ALERT";
+    } else if (n3 >= 0) {
+        var res = "CRITICAL";
+    } else if (n4 >= 0) {
+        var res = "ERROR";
+    } else if (n5 >= 0) {
+        var res = "WARNING";
+    } else if (n6 >= 0) {
+        var res = "NOTICE";
+    } else if (n7 >= 0) {
+        var res = "INFO";
+    } else if (n8 >= 0) {
+        var res = "DEBUG";
+    } else {
+        var res = "";
+    }
     return res;
 }
