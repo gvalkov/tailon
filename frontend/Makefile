@@ -15,7 +15,8 @@ EXTERNAL_JS := \
 EXTERNAL_CSS := \
 	node_modules/normalize-css/normalize.css \
 	node_modules/vue-multiselect/dist/vue-multiselect.min.css \
-	node_modules/vue-loading-overlay/dist/vue-loading.min.css
+	node_modules/vue-loading-overlay/dist/vue-loading.min.css \
+	dist/materialdesignicons.css
 
 INTERNAL_JS := \
 	js/util.js \
@@ -75,6 +76,7 @@ $(DISTDIR)/main.css: $(INTERNAL_CSS)
 	$(CMD_NODESASS) --quiet scss/main.scss > $@
 endif
 
+# //go:generate vfsgendev -source="example.com/project/data".Assets
 # go get -u github.com/shurcooL/vfsgen/cmd/vfsgendev
 assets_vfsdata.go:
 	cd .. && vfsgendev  -source=\"github.com/gvalkov/tailon/frontend\".Assets && mv $@ frontend/

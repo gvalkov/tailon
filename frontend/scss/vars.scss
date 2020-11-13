@@ -1,31 +1,34 @@
 //----------------------------------------------------------------------------
 // Fonts
 //----------------------------------------------------------------------------
-$ttfonts: (
-  "Consolas",
-  "Menlo",
-  "Monaco",
-  "Lucida Console",
-  "Liberation Mono",
-  "DejaVu Sans Mono",
-  "Bitstream Vera Sans Mono",
-  "Courier New",
-  "monospace",
-  "serif"
-);
-
+$ttfonts: ( "Consolas", "Menlo", "Monaco", "Lucida Console", "Liberation Mono", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", "monospace", "serif");
 $tailon-logview-font-size: 13px;
-
 //----------------------------------------------------------------------------
 // Colors
 //----------------------------------------------------------------------------
 $tailon-logview-background-color: #1d1f21;
 $tailon-logview-text-color: #c5c8c6;
-
-$tailon-logview-notice-background-color: #FF974F;
+$tailon-logview-emergency-background-color: #B71C1C;
+$tailon-logview-emergency-color: #1d1f21;
+$tailon-logview-alert-background-color: #D32F2F;
+$tailon-logview-alert-color: #1d1f21;
+$tailon-logview-critical-background-color: #F44336;
+$tailon-logview-critical-color: #1d1f21;
+$tailon-logview-error-background-color: #FF5722;
+$tailon-logview-error-color: #1d1f21;
+$tailon-logview-warning-background-color: #FF9100;
+$tailon-logview-warning-color: #1d1f21;
+$tailon-logview-notice-background-color: #4CAF50;
 $tailon-logview-notice-color: #1d1f21;
-
+$tailon-logview-info-background-color: #1976D2;
+$tailon-logview-info-color: #1d1f21;
+$tailon-logview-debug-background-color: #90CAF9;
+$tailon-logview-debug-color: #1d1f21;
 $tailon-logview-current-line-background-color: #282a2e;
-
 $tailon-toolbar-background-color: #282a2e;
 $tailon-toolbar-input-background-color: #373b41;
+$badge-padding-y: .25em;
+$badge-padding-x: .4em;
+$badge-font-size: 75%;
+$badge-font-weight: 700;
+$badge-border-radius: .25rem;

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/190997/42879022-6d5915fc-8a8f-11e8-8fe6-903c06bd52a9.png?raw=True" width="450px">
+  <img src="images/main_2020-11-13.png">
 </p>
 
 # Tailon [![Build Status](https://travis-ci.com/gvalkov/tailon.svg?branch=master)](https://travis-ci.com/gvalkov/tailon) [![GoDoc](https://godoc.org/github.com/gvalkov/tailon?status.svg)](https://godoc.org/github.com/gvalkov/tailon) [![Go Report Card](https://goreportcard.com/badge/github.com/gvalkov/tailon)](https://goreportcard.com/report/github.com/gvalkov/tailon) [![Apache License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/gvalkov/tailon/blob/master/LICENSE) [![GitHub release](https://img.shields.io/github/release/gvalkov/tailon.svg)](https://github.com/gvalkov/tailon/releases)
@@ -103,6 +103,19 @@ For information on usage through the configuration file, please refer to the
 ```
 [//]: # (END HELP)
 
+### Colorize improvement
+
+You need to this "texts" inside your logs in order to create the icons:
+
+- ".EMERGENCY: "
+- ".ALERT: "
+- ".CRITICAL: "
+- ".ERROR: "
+- ".WARNING: "
+- ".NOTICE: "
+- ".INFO: "
+- ".DEBUG: "
+
 ## Security
 
 Tailon runs commands on the server it is installed on. While commands that
@@ -134,6 +147,28 @@ port. Basic and digest authentication are under development.
 
 ## Development
 
+```
+git clone https://github.com/gvalkov/tailon.git
+cd tailon
+```
+
+### Requirements
+
+On Debian / Ubuntu: `sudo apt-get install entr`
+
+```
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOROOT/bin
+go get -d github.com/gorilla/handlers
+go get -d github.com/gvalkov/tailon/cmd
+go get -d github.com/gvalkov/tailon/frontend
+go get -d github.com/shurcooL/httpfs/html/vfstemplate
+go get -d github.com/shurcooL/httpgzip
+go get -d gopkg.in/igm/sockjs-go.v2/sockjs
+go get -u github.com/shurcooL/vfsgen
+```
+
 ### Frontend
 
 The web interface is a written in plain ES5 with the help of some Vue.js. A
@@ -155,12 +190,28 @@ changes to the sources.
 Note that the minified frontend bundles are committed in order to avoid people
 wanting to work only on the backend from having to pull the full `node_modules`.
 
+Complete command steps:
+
+```
+cd frontend
+go get -u github.com/shurcooL/vfsgen/cmd/vfsgendev
+yarn install
+yarn upgrade
+make all
+cd .. && vfsgendev  -source=\"github.com/gvalkov/tailon/frontend\".Assets && mv assets_vfsdata.go frontend/
+go build -tags dev
+```
 
 ### Backend
 
 The backend is written in straightforward go that tries to do as much as
 possible using only the standard library.
 
+#### Alpine Linux build
+
+- INFO: http://krolow.com.br/til/go-compile-binary-not-running-in-alpine-and-busybox/
+
+`CGO_ENABLED=0 go build -tags netgo -a -v`
 
 ### Backlog
 

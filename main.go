@@ -3,15 +3,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pelletier/go-toml"
-	flag "github.com/spf13/pflag"
 	"io/ioutil"
 	"log"
 	"net"
 	"os"
 	"strings"
 	"sync"
+
+	"github.com/mitchellh/mapstructure"
+	"github.com/pelletier/go-toml"
+	flag "github.com/spf13/pflag"
 )
 
 const scriptDescription = `
@@ -98,7 +99,7 @@ const defaultTomlConfig = `
 
     [commands.grep]
     stdin = "tail"
-    action = ["grep", "--text", "--line-buffered", "--color=never", "-e", "$script"]
+    action = ["grep", "-e", "$script"]
     default = ".*"
 
     [commands.sed]
