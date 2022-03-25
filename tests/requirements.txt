@@ -1,4 +1,4 @@
-aiohttp == 3.3.2 
+aiohttp == 3.7.4 
 psutil == 5.4.6
 pytest == 3.6.3 
 pytest-aiohttp == 0.3.0 
