@@ -1,8 +1,9 @@
 Vue.component('multiselect', window.VueMultiselect.default);
 Vue.component('vue-loading', window.VueLoading);
 
-var apiURL = endsWith(window.relativeRoot, '/') ? 'ws' : '/ws';
-var apiURL = [window.location.protocol, '//', window.location.host, window.relativeRoot, apiURL].join('');
+var apiURL = endsWith(window.location.href, '/') ?
+    window.location.href + "ws" :
+    window.location.href.replace(/[^\/]+$/, 'ws');
 
 var app = new Vue({
     el: '#app',
@@ -40,7 +41,10 @@ var app = new Vue({
         },
         downloadLink: function () {
             if (this.file) {
-                return relativeRoot + 'files/?path=' + this.file.path;
+                var suffix = 'files/?path=' + this.file.path;
+                return endsWith(window.location.pathname, '/') ?
+                    window.location.href + suffix :
+                    window.location.href.replace(/[^\/]+$/, suffix);
             }
             return '#';
         }
@@ -49,7 +53,7 @@ var app = new Vue({
         clearLogview: function () {
             this.$refs.logview.clearLines();
         },
-        backendConnect: function ( ){
+        backendConnect: function () {
             console.log('connecting to ' + apiURL);
             this.showLoadingOverlay = true;
             this.socket = new SockJS(apiURL);
@@ -113,19 +117,19 @@ var app = new Vue({
         }
     },
     watch: {
-        isConnected: function(val) {
+        isConnected: function (val) {
             this.showLoadingOverlay = !val;
         },
-        wrapLines: function(val) {
+        wrapLines: function (val) {
             this.$refs.logview.toggleWrapLines(val);
         },
-        command: function(val) {
+        command: function (val) {
             if (val && this.isConnected) {
                 this.script = this.commandScripts[val];
                 this.notifyBackend();
             }
         },
-        file: function(val) {
+        file: function (val) {
             if (val && this.isConnected) {
                 this.notifyBackend();
             }
