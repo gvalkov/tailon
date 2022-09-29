@@ -279,7 +279,7 @@ func main() {
 	config.RelativeRoot = strings.TrimRight(config.RelativeRoot, "/") + "/"
 
 	// Handle command-line file specs
-	filespecs := make([]FileSpec, len(flag.Args()))
+	filespecs := make([]FileSpec, 0, len(flag.Args()))
 	for _, spec := range flag.Args() {
 		if filespec, err := parseFileSpec(spec); err != nil {
 			fmt.Fprintf(os.Stderr, "Error parsing argument '%s': %s\n", spec, err)
