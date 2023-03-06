@@ -1,6 +1,5 @@
 {{ define "title" }}Tailon{{ end }}
 {{ define "description" }}File Viewer{{ end }}
-
 {{ define "body" }}
 
 <script>
@@ -10,84 +9,84 @@
 </script>
 
 <div id="app">
-    <transition name="fade">
-        <div v-if="!hideToolbar" id="toolbar">
-            <div class="tailon-dark toolbar-item" id="file-select">
-                <multiselect v-model="file" :options="fileList"
-                             :group-select="true"
-                             :allow-empty="false"
-                             group-values="files"
-                             group-label="group"
-                             track-by="alias"
-                             label="alias"
-                             @open="refreshFiles"
-                             :searchable="true" :show-labels="false" placeholder="File"></multiselect>
-                <!-- <select v-model="file" tabindex="1"></select> -->
-            </div>
+	<transition name="fade">
+		<div v-if="!hideToolbar" id="toolbar">
+			<div class="tailon-dark toolbar-item" id="file-select">
+				<multiselect v-model="file" :options="fileList"
+						 :group-select="true"
+						 :allow-empty="false"
+						 group-values="files"
+						 group-label="group"
+						 track-by="alias"
+						 label="alias"
+						 @open="refreshFiles"
+						 :searchable="true" :show-labels="false" placeholder="File"></multiselect>
+			</div>
 
-            <div class="tailon-dark toolbar-item" id="command-select">
-                <multiselect v-model="command" :options="allowCommandNames" :searchable="true" :show-labels="false" placeholder="Command"></multiselect>
-            </div>
+			<div class="tailon-dark toolbar-item" id="command-select">
+				<multiselect v-model="command" :options="allowCommandNames" :searchable="true" :show-labels="false" placeholder="Command"></multiselect>
+			</div>
 
-            <div class="toolbar-item toolbar-item-fill">
-                <div id="script-input" tabindex="3">
-                    <input v-model="script" @keyup.enter="notifyBackend" type="text" name="script" placeholder="" :disabled="!scriptInputEnabled" spellcheck="false">
-                    <div><i class="icon-bookmark"></i></div>
-                    <div><i class="icon-code"></i></div>
-                </div>
-            </div>
+			<div class="toolbar-item toolbar-item-fill">
+				<div id="script-input" tabindex="3">
+					<input v-model="script" @keyup.enter="notifyBackend" type="text" name="script" placeholder="" :disabled="!scriptInputEnabled" spellcheck="false">
+					<div><i class="icon-bookmark"></i></div>
+					<div><i class="icon-code"></i></div>
+				</div>
+			</div>
 
-            <div class="toolbar-item" tabindex="4">
-                <div class="button-group" id="action-bar">
-                    <a v-if="allowDownload" :href="downloadLink" title="Download File">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"/></svg>
-                    </a>
-                    <a @click="showConfig = !showConfig" title="Configure">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M507.73 109.1c-2.24-9.03-13.54-12.09-20.12-5.51l-74.36 74.36-67.88-11.31-11.31-67.88 74.36-74.36c6.62-6.62 3.43-17.9-5.66-20.16-47.38-11.74-99.55.91-136.58 37.93-39.64 39.64-50.55 97.1-34.05 147.2L18.74 402.76c-24.99 24.99-24.99 65.51 0 90.5 24.99 24.99 65.51 24.99 90.5 0l213.21-213.21c50.12 16.71 107.47 5.68 147.37-34.22 37.07-37.07 49.7-89.32 37.91-136.73zM64 472c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z"/></svg>
-                    </a>
-                    <a @click="clearLogview" title="Clear Logview">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path id="path2" d="m497.94 273.94c18.745-18.745 18.745-49.137 0-67.882l-160-160c-18.745-18.745-49.136-18.746-67.883 0l-256 256c-18.745 18.745-18.745 49.137 0 67.882l96 96c9.0022 9.0016 21.211 14.059 33.942 14.059l149.29-0.38352c96.417-96.417 120.59-121.61 204.66-205.68zm-302.63-62.627 137.37 137.37-67.314 67.313h-114.74l-80-80z"/></svg>
-                    </a>
-                    <a @click="hideToolbar = true" title="Hide Toolbar">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M8 256C8 119 119 8 256 8s248 111 248 248-111 248-248 248S8 393 8 256zm231-113.9L103.5 277.6c-9.4 9.4-9.4 24.6 0 33.9l17 17c9.4 9.4 24.6 9.4 33.9 0L256 226.9l101.6 101.6c9.4 9.4 24.6 9.4 33.9 0l17-17c9.4-9.4 9.4-24.6 0-33.9L273 142.1c-9.4-9.4-24.6-9.4-34 0z"/></svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </transition>
+			<div class="toolbar-item" tabindex="4">
+				<div class="button-group" id="action-bar">
+					<a v-if="allowDownload" :href="downloadLink" :download="fileName" target="_blank" rel="noopener noreferrer" title="Download File">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M216 0h80c13.3 0 24 10.7 24 24v168h87.7c17.8 0 26.7 21.5 14.1 34.1L269.7 378.3c-7.5 7.5-19.8 7.5-27.3 0L90.1 226.1c-12.6-12.6-3.7-34.1 14.1-34.1H192V24c0-13.3 10.7-24 24-24zm296 376v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h146.7l49 49c20.1 20.1 52.5 20.1 72.6 0l49-49H488c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"/></svg>
+					</a>
 
-    <transition name="fade">
-    <div v-if="hideToolbar" class="button-group toolbar-hidden">
-        <a @click="hideToolbar = false" title="Show Toolbar">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M504 256c0 137-111 248-248 248S8 393 8 256 119 8 256 8s248 111 248 248zM273 369.9l135.5-135.5c9.4-9.4 9.4-24.6 0-33.9l-17-17c-9.4-9.4-24.6-9.4-33.9 0L256 285.1 154.4 183.5c-9.4-9.4-24.6-9.4-33.9 0l-17 17c-9.4 9.4-9.4 24.6 0 33.9L239 369.9c9.4 9.4 24.6 9.4 34 0z"/></svg>
-        </a>
-    </div>
-    </transition>
+					<a @click="showConfig = !showConfig" title="Configure">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M507.73 109.1c-2.24-9.03-13.54-12.09-20.12-5.51l-74.36 74.36-67.88-11.31-11.31-67.88 74.36-74.36c6.62-6.62 3.43-17.9-5.66-20.16-47.38-11.74-99.55.91-136.58 37.93-39.64 39.64-50.55 97.1-34.05 147.2L18.74 402.76c-24.99 24.99-24.99 65.51 0 90.5 24.99 24.99 65.51 24.99 90.5 0l213.21-213.21c50.12 16.71 107.47 5.68 147.37-34.22 37.07-37.07 49.7-89.32 37.91-136.73zM64 472c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z"/></svg>
+					</a>
+					<a @click="clearLogview" title="Clear Logview">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path id="path2" d="m497.94 273.94c18.745-18.745 18.745-49.137 0-67.882l-160-160c-18.745-18.745-49.136-18.746-67.883 0l-256 256c-18.745 18.745-18.745 49.137 0 67.882l96 96c9.0022 9.0016 21.211 14.059 33.942 14.059l149.29-0.38352c96.417-96.417 120.59-121.61 204.66-205.68zm-302.63-62.627 137.37 137.37-67.314 67.313h-114.74l-80-80z"/></svg>
+					</a>
+					<a @click="hideToolbar = true" title="Hide Toolbar">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M8 256C8 119 119 8 256 8s248 111 248 248-111 248-248 248S8 393 8 256zm231-113.9L103.5 277.6c-9.4 9.4-9.4 24.6 0 33.9l17 17c9.4 9.4 24.6 9.4 33.9 0L256 226.9l101.6 101.6c9.4 9.4 24.6 9.4 33.9 0l17-17c9.4-9.4 9.4-24.6 0-33.9L273 142.1c-9.4-9.4-24.6-9.4-34 0z"/></svg>
+					</a>
+				</div>
+			</div>
+		</div>
+	</transition>
 
-    <transition name="fade">
-    <div v-if="showConfig" id="configuration">
-        <form>
-            <p>
-                <label for="history-lines">Lines of history:</label>
-                <input v-model.number="linesOfHistory" type="number" name="history-lines" min="0">
-            </p>
-            <p>
-                <label for="tail-lines">Initial lines to tail:</label>
-                <input v-model.number="linesToTail" type="number" name="tail-lines" min="1">
-            </p>
-            <p>
-                <label for="wrap-lines">Enable line wrapping:</label>
-                <input v-model="wrapLines" type="checkbox" name="wrap-lines" id="wrap-lines">
-            </p>
-        </form>
-    </div>
-    </transition>
+	<transition name="fade">
+	<div v-if="hideToolbar" class="button-group toolbar-hidden">
+		<a @click="hideToolbar = false" title="Show Toolbar">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M504 256c0 137-111 248-248 248S8 393 8 256 119 8 256 8s248 111 248 248zM273 369.9l135.5-135.5c9.4-9.4 9.4-24.6 0-33.9l-17-17c-9.4-9.4-24.6-9.4-33.9 0L256 285.1 154.4 183.5c-9.4-9.4-24.6-9.4-33.9 0l-17 17c-9.4 9.4-9.4 24.6 0 33.9L239 369.9c9.4 9.4 24.6 9.4 34 0z"/></svg>
+		</a>
+	</div>
+	</transition>
 
-    <vue-loading :active.sync="showLoadingOverlay" :can-cancel="false"></vue-loading>
+	<transition name="fade">
+	<div v-if="showConfig" id="configuration">
+		<form>
+			<p>
+				<label for="history-lines">Lines of history:</label>
+				<input v-model.number="linesOfHistory" type="number" name="history-lines" min="0">
+			</p>
+			<p>
+				<label for="tail-lines">Initial lines to tail:</label>
+				<input v-model.number="linesToTail" type="number" name="tail-lines" min="1">
+			</p>
+			<p>
+				<label for="wrap-lines">Enable line wrapping:</label>
+				<input v-model="wrapLines" type="checkbox" name="wrap-lines" id="wrap-lines">
+			</p>
+		</form>
+	</div>
+	</transition>
 
-    <div class="scrollable">
-        <logview ref="logview" v-bind:lines-of-history="linesOfHistory"></logview>
-    </div>
+	<vue-loading :active.sync="showLoadingOverlay" :can-cancel="false"></vue-loading>
+
+	<div class="scrollable">
+		<logview ref="logview" v-bind:lines-of-history="linesOfHistory"></logview>
+	</div>
 
 </div>
 

@@ -5,13 +5,13 @@ function formatBytes(size) {
         size /= 1024;
         ++i;
     }
-    return size.toFixed(1) + ' ' + units[i];
+    return size.toFixed(2) + ' ' + units[i];
 }
 
 function formatFilename(state) {
     if (!state.id) return state.text;
     var size = formatBytes($(state.element).data('size'));
-    return '<span>' + state.text + '</span>' + '<span style="float:right;">' + size + '</span>';
+    return '<span>' + state.text + '</span><span style="float:right;">' + size + '</span>';
 }
 
 function endsWith(str, suffix) {

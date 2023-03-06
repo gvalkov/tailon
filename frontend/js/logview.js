@@ -75,11 +75,11 @@ Vue.component('logview', {
 
             // Create spans from all elements and add them to a temporary DOM.
             var fragment = document.createDocumentFragment();
-            for (var i = 0; i < spanArray.length; i++) {
-                var span = spanArray[i];
-                this.history.push(span);
-                fragment.appendChild(span);
-            }
+
+            spanArray.forEach((span) => {
+              this.history.push(span);
+              fragment.appendChild(span);
+            });
 
             if (this.lastSpan) {
                 this.lastSpan.className = this.lastSpanClasses;
