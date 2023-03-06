@@ -43,7 +43,12 @@ var app = new Vue({
                 return relativeRoot + 'files/?path=' + this.file.path;
             }
             return '#';
-        }
+        },
+        fileName: function () {
+            if (this.file) {
+                return this.file.path.split('/').at(-1);
+            }
+            return '#';
     },
     methods: {
         clearLogview: function () {
