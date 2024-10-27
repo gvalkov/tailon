@@ -19,12 +19,6 @@ tail -f | awk
 tail -f | sed
 ```
 
-What sets tailon apart from other similar projects is:
-
-* Fully self-contained executable. Just download (or build) and run.
-* Small footprint. The tailon executable sits at 2.5MB in size and uses 10MB of RSS.
-* Responsive and minimal user-interface.
-
 ## Install
 
 Download a build for your platform from the [releases] page or install using `go get`:
