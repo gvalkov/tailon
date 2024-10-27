@@ -1,8 +1,8 @@
-BUILD ?= prod
+build: frontend
+	go build
 
-dev:
+dev: frontend
 	go build -tags dev
-	$(MAKE) frontend BUILD=dev
 
 test:
 	go test -v
@@ -11,10 +11,10 @@ test-int:
 	cd tests && .venv/bin/pytest -v
 
 frontend:
-	cd frontend && $(MAKE) clean ; $(MAKE) BUILD=$(BUILD)
+	make -C frontend clean all
 
 frontend-watch:
-	cd frontend && $(MAKE) watch BUILD=$(BUILD)
+	make -C frontend watch
 
 build-ct-image:
 	podman build -t gvalkov/tailon .

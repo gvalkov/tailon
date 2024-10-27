@@ -1,7 +1,6 @@
 CMD_CLEANCSS   := node_modules/clean-css-cli/bin/cleancss
 CMD_NODESASS   := node_modules/sass/sass.js
 
-BUILD ?= prod
 DISTDIR ?= dist
 
 EXTERNAL_CSS :=
@@ -27,7 +26,7 @@ watch:
 	@echo $(JS)  $(CSS) $(EXTERNAL_CSS) | tr ' ' '\n' | entr $(MAKE)
 
 du:
-	@du -h $(ALL_TARGETS)
+	@du -hs dist/* | sort -h
 
 $(DISTDIR)/bundle.js: $(JS)
 	npx esbuild --bundle --sourcemap js/main.js > $@
@@ -38,8 +37,7 @@ $(DISTDIR)/3rdparty.css: $(EXTERNAL_CSS)
 $(DISTDIR)/main.css: $(CSS)
 	$(CMD_NODESASS) --quiet --style compressed --source-map scss/main.scss:$@
 
-# go get -u github.com/shurcooL/vfsgen/cmd/vfsgendev
 assets_vfsdata.go:
-	cd .. && vfsgendev  -source=\"github.com/gvalkov/tailon/frontend\".Assets && mv $@ frontend/
+	cd ../ && go run -tags=dev frontend/assets_generate.go && mv $@ frontend/
 
 .PHONY: all clean watch du assets_vfsdata.go
