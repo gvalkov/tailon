@@ -18,28 +18,28 @@ const scriptDescription = `
 Usage: tailon -c <config file>
 Usage: tailon [options] <filespec> [<filespec> ...]
 
-Tailon is a webapp for looking at and searching through files and streams.
+Tailon is a webapp for searching through files and streams.
 `
 
 const scriptEpilog = `
-Tailon can be configured through a config file or with command-line flags.
+Tailon can be configured via a TOML config file or command-line flags.
 
-The command-line interface expects one or more filespec arguments, which
-specify the files to be served. The expected format is:
+The command-line interface expects one or more <filespec> arguments, which
+specify the files to serve. The format is:
 
-  [alias=name,group=name]<spec>
+  [alias=name,group=name]<source>
 
-where <spec> can be a file name, glob or directory. The optional 'alias='
-and 'group=' specifiers change the display name of the files in the UI and
-the group in which they appear.
+The "source" specifier can be a file name, glob or directory. The optional
+"alias=" and "group=" specifiers change the display name of files in the UI
+and the group in which they appear. 
 
 A file specifier points to a single, possibly non-existent file. The file
-name in the UI can be overwritten with 'alias='. For example:
+name can be overwritten with "alias=". For example:
 
   tailon alias=error.log,/var/log/apache/error.log
 
-A glob evaluates to the list of files that match a shell file name pattern.
-The pattern is evaluated each time the file list is refreshed. An 'alias='
+A glob evaluates to the list of files that match a shell filename pattern.
+The pattern is evaluated each time the file list is refreshed. An "alias="
 specifier overwrites the parent directory of each matched file in the UI.
 
   tailon "/var/log/apache/*.log" "alias=nginx,/var/log/nginx/*.log"
@@ -53,15 +53,13 @@ Example usage:
   tailon alias=messages,/var/log/messages "/var/log/*.log"
   tailon -b localhost:8080,localhost:8081 -c config.toml
 
-For information on usage through the configuration file, please refer to the
-'--help-config' option.
+See "--help-config" for configuration file usage.
 `
 
 const configFileHelp = `
-Tailon can be configured through a TOML config file. The config file allows
-more configurability than the command-line interface.
+The following options can be set through the config file:
 
-  # The <title> of the index page.
+  # The <title> element of the of the webapp.
   title = "Tailon file viewer"
 
   # The root of the web application.
@@ -70,18 +68,20 @@ more configurability than the command-line interface.
   # The addresses to listen on. Can be an address:port combination or an unix socket.
   listen-addr = [":8080"]
 
-  # Allow download of know files (only those matched by a filespec).
+  # Allow downloading of known files (i.e those matched by a filespec).
   allow-download = true
 
   # Commands that will appear in the UI.
   allow-commands = ["tail", "grep", "sed", "awk"]
 
+  # A table of commands that the backend can execute. This is best illustrated by
+  # the default configuration listed below.
+  [commands]
+
   # File, glob and dir filespecs are similar in principle to their
   # command-line counterparts.
 
-  # TODO
-
-At startup, tailon loads a default config file. The contents of that file are:
+At startup tailon loads its default config file. The contents of that file are:
 `
 
 const defaultTomlConfig = `
@@ -238,11 +238,11 @@ func main() {
 
 	printHelp := flag.BoolP("help", "h", false, "Show this help message and exit")
 	printConfigHelp := flag.BoolP("help-config", "e", false, "Show configuration file help and exit")
-	bindAddr := flag.StringP("bind", "b", strings.Join(config.BindAddr, ","), "Listen on the specified address and port")
+	bindAddr := flag.StringP("bind", "b", strings.Join(config.BindAddr, ","), "Address and port to listen on")
 
-	flag.StringVarP(&config.RelativeRoot, "relative-root", "r", config.RelativeRoot, "webapp relative root")
-	flag.BoolVarP(&config.AllowDownload, "allow-download", "a", config.AllowDownload, "allow file downloads")
-	flag.StringVarP(&config.ConfigPath, "config", "c", "", "")
+	flag.StringVarP(&config.RelativeRoot, "relative-root", "r", config.RelativeRoot, "Webapp relative root")
+	flag.BoolVarP(&config.AllowDownload, "allow-download", "a", config.AllowDownload, "Allow file downloads")
+	flag.StringVarP(&config.ConfigPath, "config", "c", "", "Path to TOML configuration file")
 	flag.Parse()
 
 	flag.Usage = func() {
@@ -278,7 +278,7 @@ func main() {
 	config.RelativeRoot = "/" + strings.TrimLeft(config.RelativeRoot, "/")
 	config.RelativeRoot = strings.TrimRight(config.RelativeRoot, "/") + "/"
 
-	// Handle command-line file specs
+	// Handle command-line file specs.
 	filespecs := make([]FileSpec, len(flag.Args()))
 	for _, spec := range flag.Args() {
 		if filespec, err := parseFileSpec(spec); err != nil {

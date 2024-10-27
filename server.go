@@ -109,7 +109,7 @@ func wsHandler(session sockjs.Session) {
 
 // Goroutine handling received messages and streaming of file contents.
 func wsWriter(session sockjs.Session, messages chan string, done <-chan struct{}) {
-	// The processes that make up the pipeline. The stdout of procA is connected to  the stdin of procB.
+	// The processes that make up the pipeline. The stdout of procA is connected to the stdin of procB.
 	var procA *exec.Cmd
 	var procB *cmd.Cmd
 

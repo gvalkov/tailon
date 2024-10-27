@@ -2,10 +2,15 @@
   <img src="https://user-images.githubusercontent.com/190997/42879022-6d5915fc-8a8f-11e8-8fe6-903c06bd52a9.png?raw=True" width="450px">
 </p>
 
-# Tailon [![Build Status](https://travis-ci.com/gvalkov/tailon.svg?branch=master)](https://travis-ci.com/gvalkov/tailon) [![GoDoc](https://godoc.org/github.com/gvalkov/tailon?status.svg)](https://godoc.org/github.com/gvalkov/tailon) [![Go Report Card](https://goreportcard.com/badge/github.com/gvalkov/tailon)](https://goreportcard.com/report/github.com/gvalkov/tailon) [![Apache License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/gvalkov/tailon/blob/master/LICENSE) [![GitHub release](https://img.shields.io/github/release/gvalkov/tailon.svg)](https://github.com/gvalkov/tailon/releases)
+# Tailon
+
+[![GoDoc](https://godoc.org/github.com/gvalkov/tailon?status.svg)](https://godoc.org/github.com/gvalkov/tailon)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gvalkov/tailon)](https://goreportcard.com/report/github.com/gvalkov/tailon)
+[![Apache License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/gvalkov/tailon/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/gvalkov/tailon.svg)](https://github.com/gvalkov/tailon/releases)
 
 Tailon is a webapp for looking at and searching through files and streams. In a
-nutshell, it is a fancy web wrapper around the following commands:
+nutshell, it is a web wrapper around the following commands:
 
 ```
 tail -f
@@ -28,7 +33,7 @@ Download a build for your platform from the [releases] page or install using `go
 go get -u github.com/gvalkov/tailon
 ```
 
-A docker image is also available:
+A container image is also available:
 
 ```
 docker run --rm gvalkov/tailon --help
@@ -36,9 +41,8 @@ docker run --rm gvalkov/tailon --help
 
 ## Usage
 
-Tailon is a command-line program that starts a local HTTP server, which in turn
-streams the output of commands such as `tail` and `grep`. It can be configured
-from its command-line interface or through the convenience of a [toml] config
+Tailon is a webapp that streams the output of commands such as `tail` and
+`grep`. It can be configured with command-line flags or with a [toml] config
 file. Some options, like adding new commands, are only available through the
 configuration file.
 
@@ -58,33 +62,33 @@ server-side functionality is summarized entirely in its help message:
 Usage: tailon -c <config file>
 Usage: tailon [options] <filespec> [<filespec> ...]
 
-Tailon is a webapp for looking at and searching through files and streams.
+Tailon is a webapp for searching through files and streams.
 
-  -a, --allow-download         allow file downloads (default true)
-  -b, --bind string            Listen on the specified address and port (default ":8080")
-  -c, --config string
+  -a, --allow-download         Allow file downloads (default true)
+  -b, --bind string            Address and port to listen on (default ":8080")
+  -c, --config string          Path to TOML configuration file
   -h, --help                   Show this help message and exit
   -e, --help-config            Show configuration file help and exit
-  -r, --relative-root string   webapp relative root (default "/")
+  -r, --relative-root string   Webapp relative root (default "/")
 
-Tailon can be configured through a config file or with command-line flags.
+Tailon can be configured via a TOML config file or command-line flags.
 
-The command-line interface expects one or more filespec arguments, which
-specify the files to be served. The expected format is:
+The command-line interface expects one or more <filespec> arguments, which
+specify the files to serve. The format is:
 
-  [alias=name,group=name]<spec>
+  [alias=name,group=name]<source>
 
-where <spec> can be a file name, glob or directory. The optional 'alias='
-and 'group=' specifiers change the display name of the files in the UI and
-the group in which they appear.
+The "source" specifier can be a file name, glob or directory. The optional
+"alias=" and "group=" specifiers change the display name of files in the UI
+and the group in which they appear.
 
 A file specifier points to a single, possibly non-existent file. The file
-name in the UI can be overwritten with 'alias='. For example:
+name can be overwritten with "alias=". For example:
 
   tailon alias=error.log,/var/log/apache/error.log
 
-A glob evaluates to the list of files that match a shell file name pattern.
-The pattern is evaluated each time the file list is refreshed. An 'alias='
+A glob evaluates to the list of files that match a shell filename pattern.
+The pattern is evaluated each time the file list is refreshed. An "alias="
 specifier overwrites the parent directory of each matched file in the UI.
 
   tailon "/var/log/apache/*.log" "alias=nginx,/var/log/nginx/*.log"
@@ -98,19 +102,18 @@ Example usage:
   tailon alias=messages,/var/log/messages "/var/log/*.log"
   tailon -b localhost:8080,localhost:8081 -c config.toml
 
-For information on usage through the configuration file, please refer to the
-'--help-config' option.
+See "--help-config" for configuration file usage.
 ```
 [//]: # (END HELP)
 
 ## Security
 
 Tailon runs commands on the server it is installed on. While commands that
-accept a script argument (such as awk, sed and grep) should be invulnerable to
-shell injection, they may still allow for arbitrary command execution and
-unrestricted access to the filesystem.
+accept a script argument (such as awk, sed and grep) should be invulnerable
+to shell injection, they may still allow for arbitrary command execution
+and unrestricted access to the filesystem.
 
-To clarify this point, consider the following input to the sed command:
+To clarify this point, consider the following script input to the `sed` command:
 
 ```
 s/a/b'; cat /etc/secrets
@@ -124,37 +127,33 @@ that has the same effect as the above attempt for shell injection:
 r /etc/secrets
 ```
 
-The default set of enabled commands - tail, grep and awk - should be safe to
-use. GNU awk is run in [sandbox] mode, which prevents scripts from accessing your
+The default set of enabled commands (tail, grep and awk) should be safe to use.
+GNU awk is run in [sandbox] mode, which prevents scripts from accessing your
 system, either through the `system()` builtin or by using input redirection.
 
 By default, tailon is accessible to anyone who knows the server address and
-port. Basic and digest authentication are under development.
+port.
 
 
 ## Development
 
 ### Frontend
 
-The web interface is a written in plain ES5 with the help of some Vue.js. A
-simple makefile is used to bundle and compress the frontend assets. To work on
-the frontend, make sure you're building with the `dev` build tag:
+To work on the frontend, make sure you're building with the `dev` build tag:
 
 ```
 go build -tags dev
 ```
 
 This will ensure that the `tailon` binary is reading assets from the
-`frontend/dist` directory instead of from `frontend/assets_vfsdata.go`. To
-compile the web assets, use `make all` or `make all BUILD=dev` in case you want
-to simply concatenate files instead of also compressing them.
+`frontend/dist` directory instead of from `frontend/assets_vfsdata.go`. 
+To compile the web assets, use `make all` in `frontend`.
 
-The `make watch` goal can be used to continuously update the bundles as you make
-changes to the sources.
+The `make watch` goal can be used to continuously update the bundles as you
+make changes to the sources.
 
-Note that the minified frontend bundles are committed in order to avoid people
-wanting to work only on the backend from having to pull the full `node_modules`.
-
+Note that the frontend bundles are committed in order to make life easier for
+people that only want to work on the backend.
 
 ### Backend
 
@@ -162,9 +161,9 @@ The backend is written in straightforward go that tries to do as much as
 possible using only the standard library.
 
 
-### Backlog
+### TODO
 
-* Directory serving is not implemented yet.
+* Directory serving.
 
 * User-specified TOML configuration files.
 
@@ -184,6 +183,8 @@ possible using only the standard library.
 
 * Stderr is streamed to the client, but it is not handled at the moment.
 
+* Support ANSI color codes.
+
 
 ### Testing
 
@@ -192,8 +193,8 @@ tests which you can run with `cd tests; pytest`. Alternatively, you can run both
 with `make test`.
 
 The integration tests are written in Python and use `pytest` and `aiohttp` to
-interact with a running `tailon` instance. To run the integration tests, you
-first need to install the needed dependencies:
+interact with a running `tailon` instance. To run them you first need to
+install their dependencies:
 
 ```shell
 # Option 1: Using a virtualenv

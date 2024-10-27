@@ -7,7 +7,8 @@ import (
 	"time"
 )
 
-// ListEntry is an entry that appears in the UI file input. All FileSpecs ultimately  result in  one or more ListEntry instances, which  the server ships off to the client.
+// ListEntry is an entry that appears in the UI file input.
+// FileSpecs are transformed into one or more ListEntry instances, which the backend sends to the client.
 type ListEntry struct {
 	Path    string    `json:"path"`
 	Alias   string    `json:"alias"`
