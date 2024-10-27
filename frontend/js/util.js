@@ -1,17 +1,17 @@
 export function formatBytes(size) {
-    var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     var i = 0;
-    while(size >= 1024) {
+    while (size >= 1024) {
         size /= 1024;
         ++i;
     }
-    return size.toFixed(1) + ' ' + units[i];
+    return size.toFixed(1) + " " + units[i];
 }
 
 export function formatFilename(state) {
     if (!state.id) return state.text;
-    var size = formatBytes($(state.element).data('size'));
-    return '<span>' + state.text + '</span>' + '<span style="float:right;">' + size + '</span>';
+    var size = formatBytes($(state.element).data("size"));
+    return "<span>" + state.text + "</span>" + '<span style="float:right;">' + size + "</span>";
 }
 
 export function endsWith(str, suffix) {
@@ -26,7 +26,7 @@ const escape_entity_map = {
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
-    "/": '&#x2F;'
+    "/": "&#x2F;",
 };
 
 // This is the escapeHtml function from mustache.js.
@@ -39,18 +39,20 @@ export function escapeHtml(str) {
 export function parseQueryString(str) {
     var res = {};
 
-    str.substr(1).split('&').forEach(function(item) {
-        var el = item.split("=");
+    str.substr(1)
+        .split("&")
+        .forEach(function (item) {
+            var el = item.split("=");
 
-        var key = el[0];
-        var value = el[1] && decodeURIComponent(el[1]);
+            var key = el[0];
+            var value = el[1] && decodeURIComponent(el[1]);
 
-        if (key in res) {
-            res[key].push(value);
-        } else {
-            res[key] = [value];
-        }
-    });
+            if (key in res) {
+                res[key].push(value);
+            } else {
+                res[key] = [value];
+            }
+        });
 
     return res;
 }
