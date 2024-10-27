@@ -1,5 +1,5 @@
-@import 'vars.scss';
-
+@use "sass:color";
+@use 'vars.scss' as *;
 
 body {
   font: 13px/1.5 'Helvetica Neue',Arial,'Liberation Sans',FreeSans,sans-serif;
@@ -57,7 +57,7 @@ div #command-select {
 
 #script-input {
   box-sizing: border-box;
-  box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
+  box-shadow: 2px 2px 2px 0px color.adjust($tailon-toolbar-input-background-color, $lightness: -10%);
 
   height: 26px;
 
@@ -105,7 +105,7 @@ div #command-select {
 }
 
 .toolbar-hover {
-  background-color: lighten($tailon-toolbar-input-background-color, 5%);
+  background-color: color.adjust($tailon-toolbar-input-background-color, $lightness: 5%);
 }
 
 .toolbar-text {
@@ -118,7 +118,7 @@ div #command-select {
   padding-right: 5px;
 
   a {
-    box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
+    box-shadow: 2px 2px 2px 0px color.adjust($tailon-toolbar-input-background-color, $lightness: -10%);
     @extend .toolbar-widget;
 
     float: left;
@@ -224,7 +224,7 @@ div #command-select {
 }
 
 input::selection {
-  @include selected-placeholder(darken(#373b41, 40%));
+  @include selected-placeholder(color.adjust(#373b41, $lightness: -40%));
   color: white;
 }
 
@@ -246,7 +246,7 @@ input::placeholder {
 
   border: 5px solid $tailon-toolbar-background-color;
   box-sizing: border-box;
-  box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
+  box-shadow: 2px 2px 2px 0px color.adjust($tailon-toolbar-input-background-color, $lightness: -10%);
 
   form {
     padding: 10px;
@@ -286,7 +286,7 @@ input::placeholder {
       line-height: 26px;
       font-size: 13px;
       color: #c5c8c6;
-      box-shadow: 2px 2px 2px 0px darken($tailon-toolbar-input-background-color, 10%);
+      box-shadow: 2px 2px 2px 0px color.adjust($tailon-toolbar-input-background-color, $lightness: -10%);
       min-height: inherit;
   }
 
@@ -316,7 +316,7 @@ input::placeholder {
       background: #41b883;
       /* outline: none; */
       /* color: #fff; */
-      background: lighten($tailon-toolbar-input-background-color, 5%);
+      background: color.adjust($tailon-toolbar-input-background-color, $lightness: 5%);
   }
 
   /* .multiselect__option--highlight:after { */
@@ -359,7 +359,7 @@ input::placeholder {
   }
 
   .multiselect__option--selected {
-      background: lighten($tailon-toolbar-input-background-color, 5%);
+      background: color.adjust($tailon-toolbar-input-background-color, $lightness: 5%);
       color: #c5c8c6;
       font-weight: inherit;
   }

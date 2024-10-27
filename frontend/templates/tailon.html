@@ -83,12 +83,11 @@
     </div>
     </transition>
 
-    <vue-loading :active.sync="showLoadingOverlay" :can-cancel="false"></vue-loading>
+    <loading :active.sync="showLoadingOverlay" :can-cancel="false"></loading>
 
     <div class="scrollable">
-        <logview ref="logview" v-bind:lines-of-history="linesOfHistory"></logview>
+        <LogView ref="logview" v-bind:lines-of-history="linesOfHistory"></LogView>
     </div>
-
 </div>
 
 {{ end }}

@@ -1,4 +1,4 @@
-function formatBytes(size) {
+export function formatBytes(size) {
     var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     var i = 0;
     while(size >= 1024) {
@@ -8,21 +8,21 @@ function formatBytes(size) {
     return size.toFixed(1) + ' ' + units[i];
 }
 
-function formatFilename(state) {
+export function formatFilename(state) {
     if (!state.id) return state.text;
     var size = formatBytes($(state.element).data('size'));
     return '<span>' + state.text + '</span>' + '<span style="float:right;">' + size + '</span>';
 }
 
-function endsWith(str, suffix) {
+export function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
-function startsWith(str, prefix) {
+export function startsWith(str, prefix) {
     return str.indexOf(prefix) === 0;
 }
 
-var escape_entity_map = {
+const escape_entity_map = {
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -30,13 +30,13 @@ var escape_entity_map = {
 };
 
 // This is the escapeHtml function from mustache.js.
-function escapeHtml(str) {
+export function escapeHtml(str) {
     return String(str).replace(/[&<>\/]/g, function (s) {
         return escape_entity_map[s];
     });
 }
 
-function parseQueryString(str) {
+export function parseQueryString(str) {
     var res = {};
 
     str.substr(1).split('&').forEach(function(item) {

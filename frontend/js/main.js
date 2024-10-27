@@ -1,36 +1,43 @@
-Vue.component('multiselect', window.VueMultiselect.default);
-Vue.component('vue-loading', window.VueLoading);
+import { createApp, ref } from "vue/dist/vue.esm-bundler.js";
+import Multiselect from "vue-multiselect";
 
-var apiURL = endsWith(window.relativeRoot, '/') ? 'ws' : '/ws';
+import Loading from 'vue-loading-overlay';
+import SockJS from "sockjs-client/dist/sockjs";
+
+import LogView from "./logview.js";
+import * as util from "./util.js";
+
+var apiURL = util.endsWith(window.relativeRoot, '/') ? 'ws' : '/ws';
 var apiURL = [window.location.protocol, '//', window.location.host, window.relativeRoot, apiURL].join('');
 
-var app = new Vue({
-    el: '#app',
+const app = createApp({
     delimiters: ['<%', '%>'],
-    data: {
-        'relativeRoot': relativeRoot,
-        'commandScripts': commandScripts,
+    data() {
+        return {
+            'relativeRoot': relativeRoot,
+            'commandScripts': commandScripts,
 
-        'fileList': [],
-        'allowCommandNames': allowCommandNames,
-        'allowDownload': allowDownload,
+            'fileList': [],
+            'allowCommandNames': allowCommandNames,
+            'allowDownload': allowDownload,
 
-        'file': null,
-        'command': null,
-        'script': null,
+            'file': null,
+            'command': null,
+            'script': null,
 
-        'linesOfHistory': 2000,  // 0 for infinite history
-        'linesToTail': 10,
-        'wrapLines': false,
+            'linesOfHistory': 2000,  // 0 for infinite history
+            'linesToTail': 10,
+            'wrapLines': false,
 
-        'hideToolbar': false,
-        'showConfig': false,
-        'showLoadingOverlay': false,
+            'hideToolbar': false,
+            'showConfig': false,
+            'showLoadingOverlay': false,
 
-        'socket': null,
-        'isConnected': false
+            'socket': null,
+            'isConnected': false
+        }
     },
-    created: function () {
+    created() {
         this.backendConnect();
         this.command = this.allowCommandNames[0];
     },
@@ -132,3 +139,8 @@ var app = new Vue({
         }
     }
 });
+
+app.component('multiselect', Multiselect);
+app.component('logview', LogView);
+app.component('loading', Loading);
+app.mount('#app');

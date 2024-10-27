@@ -1,6 +1,12 @@
-Vue.component('logview', {
+import { ref, useTemplateRef } from "vue";
+import { escapeHtml } from "./util.js";
+
+export default {
     template: '<div class="log-view"></div>',
     props: ["linesOfHistory"],
+    setup() {
+        const logview = useTemplateRef("logview");
+    },
     data: function() {
         return {
             history: [],
@@ -95,7 +101,6 @@ Vue.component('logview', {
             this.lastSpan = this.history[this.history.length-1];
             this.lastSpanClasses = this.lastSpan.className;
             this.lastSpan.className = this.lastSpanClasses + ' log-entry-current';
-
         }
     }
-});
+};
