@@ -6,17 +6,17 @@ import time
 import subprocess
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def unix_socket(tmpdir_factory):
-    return str(tmpdir_factory.mktemp('tailon') / 'httpd.sock')
+    return str(tmpdir_factory.mktemp("tailon") / "httpd.sock")
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def server(request, unix_socket):
     def inner(*args):
-        cmd = ['./tailon', '-b', unix_socket, *args]
+        cmd = ["./tailon", "-b", unix_socket, *args]
 
-        proc = subprocess.Popen(cmd, cwd='../')
+        proc = subprocess.Popen(cmd, cwd="../")
 
         # Convenience methods.
         proc.sock = unix_socket
@@ -39,13 +39,14 @@ async def client(request, unix_socket, event_loop):
     def close():
         async def aclose():
             await session.close()
-        event_loop.run_until_complete(aclose())
-    request.addfinalizer(close)
 
+        event_loop.run_until_complete(aclose())
+
+    request.addfinalizer(close)
     return session
 
 
 def get_child_procs(pid):
-        procs = psutil.process_iter(attrs=['pid', 'ppid'])
-        procs = [i for i in procs if i.ppid() == pid]
-        return procs
+    procs = psutil.process_iter(attrs=["pid", "ppid"])
+    procs = [i for i in procs if i.ppid() == pid]
+    return procs
