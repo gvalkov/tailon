@@ -1,0 +1,5 @@
+aiohttp
+psutil
+pytest
+pytest-aiohttp
+pytest-asyncio

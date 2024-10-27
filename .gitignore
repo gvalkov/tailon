@@ -4,6 +4,7 @@ node_modules/
 /gin-bin
 /dist
 .pytest_cache
+tests/.venv
 
 ### Editors ###
 *~

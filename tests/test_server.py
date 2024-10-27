@@ -6,11 +6,10 @@ import pytest
 import aiohttp
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("root", ["/", "tailon/", "tailon/tailon/"])
 async def test_relativeroot(server, client, root):
     proc = server("--relative-root", root, "testdata/ex1/var/log/1.log")
-    for path in "", "ws", "vfs/dist/main.js":
+    for path in "", "ws", "vfs/dist/bundle.js":
         url = urljoin("http://localhost", root + path)
         res = await client.get(url)
         assert res.status == 200
@@ -21,7 +20,6 @@ async def test_relativeroot(server, client, root):
     assert res.status == 404, out
 
 
-@pytest.mark.asyncio
 async def test_sockjs_list(server, client):
     proc = server("testdata/ex1/var/log/1.log")
     async with client.ws_connect("http://localhost/ws/0/0/websocket") as ws:
@@ -32,7 +30,6 @@ async def test_sockjs_list(server, client):
         assert res["__default__"][0]["path"] == "testdata/ex1/var/log/1.log"
 
 
-@pytest.mark.asyncio
 async def test_sockjs_frontendmessage(server, client):
     proc = server("testdata/ex1/var/log/1.log", "testdata/ex1/var/log/2.log")
 

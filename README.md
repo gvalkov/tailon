@@ -190,20 +190,14 @@ possible using only the standard library.
 
 The project has unit-tests, which you can run with `go test` and integration
 tests which you can run with `cd tests; pytest`. Alternatively, you can run both
-with `make test`.
+with `make test test-int`.
 
 The integration tests are written in Python and use `pytest` and `aiohttp` to
-interact with a running `tailon` instance. To run them you first need to
-install their dependencies:
+interact with a running `tailon` instance.
 
 ```shell
-# Option 1: Using a virtualenv
-python3 -m venv path/to/venv
-source path/to/venv/bin/activate
-python3 -m pip install -r tests/requirements.txt
-
-# Option 2: User site-packages
-python3 -m pip install --user -r tests/requirements.txt
+make test/.venv  # run once to set up virtualenv and dependencies
+make test-int
 ```
 
 

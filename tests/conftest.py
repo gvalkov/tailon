@@ -32,18 +32,12 @@ def server(request, unix_socket):
 
 
 @pytest.fixture()
-async def client(request, unix_socket, event_loop):
+async def client(request, unix_socket):
     conn = aiohttp.UnixConnector(path=unix_socket)
     session = aiohttp.ClientSession(connector=conn)
 
-    def close():
-        async def aclose():
-            await session.close()
-
-        event_loop.run_until_complete(aclose())
-
-    request.addfinalizer(close)
-    return session
+    async with session as s:
+        yield s
 
 
 def get_child_procs(pid):
