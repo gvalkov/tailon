@@ -1,7 +1,9 @@
-build: frontend
-	go build
+prod:
+	$(MAKE) BUILD=prod frontend
+	go build -v
 
-dev: frontend
+dev:
+	$(MAKE) BUILD=dev frontend
 	go build -tags dev
 
 test:
@@ -11,7 +13,7 @@ test-int:
 	cd tests && .venv/bin/pytest -v
 
 frontend:
-	make -C frontend clean all
+	make -C frontend clean all du
 
 frontend-watch:
 	make -C frontend watch

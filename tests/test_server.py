@@ -9,7 +9,7 @@ import aiohttp
 @pytest.mark.parametrize("root", ["/", "tailon/", "tailon/tailon/"])
 async def test_relativeroot(server, client, root):
     proc = server("--relative-root", root, "testdata/ex1/var/log/1.log")
-    for path in "", "ws", "vfs/dist/bundle.js":
+    for path in "", "ws", "vfs/dist/main.js":
         url = urljoin("http://localhost", root + path)
         res = await client.get(url)
         assert res.status == 200
