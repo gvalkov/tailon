@@ -51,7 +51,7 @@ server-side functionality is summarized entirely in its help message:
 
 [//]: # (run "make README.md" to update the next section with the output of tailon --help)
 
-[//]: # (BEGIN HELP)
+[//]: # (BEGIN HELP_USAGE)
 ```
 Usage: tailon -c <config file>
 Usage: tailon [options] <filespec> [<filespec> ...]
@@ -98,7 +98,63 @@ Example usage:
 
 See "--help-config" for configuration file usage.
 ```
-[//]: # (END HELP)
+[//]: # (END HELP_USAGE)
+
+[//]: # (BEGIN HELP_CONFIG)
+```
+The following options can be set through the config file:
+
+  # The <title> element of the of the webapp.
+  title = "Tailon file viewer"
+
+  # The root of the web application.
+  relative-root = "/"
+
+  # The addresses to listen on. Can be an address:port combination or an unix socket.
+  listen-addr = [":8080"]
+
+  # Allow downloading of known files (i.e those matched by a filespec).
+  allow-download = true
+
+  # Commands that will appear in the UI.
+  allow-commands = ["tail", "grep", "sed", "awk"]
+
+  # A table of commands that the backend can execute. This is best illustrated by
+  # the default configuration listed below.
+  [commands]
+
+  # File, glob and dir filespecs are similar in principle to their
+  # command-line counterparts.
+
+At startup tailon loads the following default configuration:
+
+  title = "Tailon file viewer"
+  relative-root = "/"
+  listen-addr = [":8080"]
+  allow-download = true
+  allow-commands = ["tail", "grep", "sed", "awk"]
+
+  [commands]
+
+    [commands.tail]
+    action = ["tail", "-n", "$lines", "-F", "$path"]
+
+    [commands.grep]
+    stdin = "tail"
+    action = ["grep", "--text", "--line-buffered", "--color=never", "-e", "$script"]
+    default = ".*"
+
+    [commands.sed]
+    stdin = "tail"
+    action = ["sed", "-u", "-e", "$script"]
+    default = "s/.*/&/"
+
+    [commands.awk]
+    stdin = "tail"
+    action = ["awk", "--sandbox", "$script"]
+    default = "{print $0; fflush()}"
+```
+[//]: # (END HELP_CONFIG)
 
 ## Security
 
@@ -140,7 +196,7 @@ go build -tags dev
 ```
 
 This will ensure that the `tailon` binary is reading assets from the
-`frontend/dist` directory instead of from `frontend/assets_vfsdata.go`. 
+`frontend/dist` directory instead of from `frontend/assets_vfsdata.go`.
 To compile the web assets, use `make all` in `frontend`.
 
 The `make watch` goal can be used to continuously update the bundles as you

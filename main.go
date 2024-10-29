@@ -81,7 +81,7 @@ The following options can be set through the config file:
   # File, glob and dir filespecs are similar in principle to their
   # command-line counterparts.
 
-At startup tailon loads its default config file. The contents of that file are:
+At startup tailon loads the following default configuration:
 `
 
 const defaultTomlConfig = `

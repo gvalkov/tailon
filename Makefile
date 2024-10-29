@@ -21,9 +21,10 @@ frontend-watch:
 build-ct-image:
 	podman build -t gvalkov/tailon .
 
-README.md: main.go
+README.md:
 	go build
-	ed $@ <<< $$'/BEGIN HELP/+2,/END HELP/-2d\n/BEGIN HELP/+1r !./tailon --help 2>&1\n,w'
+	ed $@ <<< $$'/BEGIN HELP_USAGE/+2,/END HELP_USAGE/-2d\n/BEGIN HELP_USAGE/+1r !./tailon --help 2>&1\n,w'
+	ed $@ <<< $$'/BEGIN HELP_CONFIG/+2,/END HELP_CONFIG/-2d\n/BEGIN HELP_CONFIG/+1r !./tailon --help-config 2>&1\n,w'
 	sed -i 's/[ \t]*$$//' $@
 
 tests/.venv:
@@ -34,5 +35,5 @@ tests/requirements.txt: tests/requirements.in
 	pip-compile $< > $@
 
 
-.PHONY: dev test frontend frontend-watch build-ct-image
+.PHONY: dev test frontend frontend-watch build-ct-image README.md
 .ONESHELL:
