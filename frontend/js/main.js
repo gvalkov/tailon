@@ -50,6 +50,12 @@ const app = createApp({
             }
             return "#";
         },
+        downloadFileName: function () {
+            if (this.file) {
+                return this.file.path.split("/").at(-1);
+            }
+            return "#";
+        }
     },
     methods: {
         clearLogview: function () {
