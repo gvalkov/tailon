@@ -1,9 +1,0 @@
-builds:
-  - binary: tailon
-    goos:
-      - linux
-      - darwin
-    goarch:
-      - amd64
-      - arm64
-      - arm
