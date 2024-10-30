@@ -150,9 +150,10 @@ type FileSpec struct {
 }
 
 // Parse a string into a filespec. Example inputs are:
-//   alias=1,group=2,/var/log/messages
-//   /var/log/
-//   /var/log/*
+//
+//	alias=1,group=2,/var/log/messages
+//	/var/log/
+//	/var/log/*
 func parseFileSpec(spec string) (FileSpec, error) {
 	var filespec FileSpec
 	var path string

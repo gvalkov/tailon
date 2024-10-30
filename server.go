@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"github.com/gorilla/handlers"
 	"github.com/gvalkov/tailon/cmd"
+	"github.com/igm/sockjs-go/v3/sockjs"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
 	"github.com/shurcooL/httpgzip"
-	"github.com/igm/sockjs-go/v3/sockjs"
 	"html/template"
 	"log"
 	"net/http"
@@ -162,7 +162,8 @@ func wsWriter(session sockjs.Session, messages chan string, done <-chan struct{}
 
 // Expands the variables in main.CommandSpec.Action with the values in the
 // frontend command. For example:
-//    ["tail", "-n", "$lines", "-F", "$path"] -> ["tail", "-n", "10", "-F", "f1.txt"]
+//
+//	["tail", "-n", "$lines", "-F", "$path"] -> ["tail", "-n", "10", "-F", "f1.txt"]
 func expandCommandArgs(action []string, cmd FrontendCommand) []string {
 	var res = make([]string, 0)
 
