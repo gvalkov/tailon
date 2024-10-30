@@ -13,7 +13,6 @@ ALL_TARGETS :=
 ALL_TARGETS += $(DISTDIR)/main.js
 ALL_TARGETS += $(DISTDIR)/3rdparty.css
 ALL_TARGETS += $(DISTDIR)/main.css 
-ALL_TARGETS += assets_vfsdata.go
  
 CSS := $(wildcard scss/*.scss)
 JS := $(wildcard js/*.js)
@@ -38,7 +37,7 @@ watch:
 	@echo $(JS) $(CSS) $(EXTERNAL_CSS) | tr ' ' '\n' | entr $(MAKE)
 
 du:
-	@du -hs assets_vfsdata.go dist/* | sort -h
+	@du -hs dist/* | sort -h
 
 $(DISTDIR)/main.js: $(JS)
 	npx esbuild --bundle $(ESBUILD_ARGS) --outdir=dist/ js/main.js
@@ -49,7 +48,4 @@ $(DISTDIR)/3rdparty.css: $(EXTERNAL_CSS)
 $(DISTDIR)/main.css: $(CSS)
 	$(CMD_NODESASS) --quiet $(SCSS_ARGS) scss/main.scss:$@
 
-assets_vfsdata.go:
-	cd ../ && go run -tags=dev frontend/assets_generate.go && mv $@ frontend/
-
-.PHONY: all clean watch du assets_vfsdata.go
+.PHONY: all clean watch du 

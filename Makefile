@@ -1,10 +1,11 @@
 prod:
 	$(MAKE) BUILD=prod frontend
+	go generate -v
 	go build -v
 
 dev:
 	$(MAKE) BUILD=dev frontend
-	go build -tags dev
+	go build -v -tags dev
 
 test:
 	go test -v
@@ -34,6 +35,8 @@ tests/.venv:
 tests/requirements.txt: tests/requirements.in
 	pip-compile $< > $@
 
+frontend_bin.go:
+	go run frontend_gen.go
 
-.PHONY: dev test frontend frontend-watch build-ct-image README.md
+.PHONY: dev test frontend frontend-watch build-ct-image README.md frontend_bin.go
 .ONESHELL:
